@@ -38,10 +38,18 @@
     --achievement-locked-border: var(--modal-secondary-text-color);
     --achievement-unlocked-border: var(--modal-record-message-color);
     --toast-bg-color: var(--modal-record-message-color);
-    --cols: 6; 
-    --pattern-cell-bg: rgba(255, 255, 255, 0.1); 
+    
+    /* General card/cell settings */
+    --cols: 6; /* Default for memory game responsive sizing */
+    --base-cell-size-desktop: 75px;
+    --base-cell-spacing-desktop: 8px;
+
+    /* Pattern Challenge specific cell settings */
+    --pattern-cell-size-desktop: 55px; /* کوچکتر شد */
+    --pattern-cell-spacing-desktop: 5px; /* فاصله کمتر */
+    --pattern-cell-bg: rgba(255, 255, 255, 0.08); 
     --pattern-cell-highlight-bg: #00d9ff; 
-    --pattern-cell-highlight-outline: rgba(0,0,0,0.3); /* رنگ outline برای هایلایت */
+    --pattern-cell-highlight-outline: rgba(0,0,0,0.4); 
     --pattern-cell-correct-bg: #32ff7e; 
     --pattern-cell-wrong-bg: #ff3838; 
     --hud-text-color: #e0e0e0;
@@ -83,16 +91,13 @@ body.day-mode {
     --modal-shadow-color: rgba(0, 0, 0, 0.15);
     --modal-list-border-color: #ced4da;
     --achievement-item-bg: rgba(0,0,0,0.03);
-    --pattern-cell-bg: rgba(0, 0, 0, 0.08); 
+    --pattern-cell-bg: rgba(0, 0, 0, 0.05); 
     --pattern-cell-highlight-bg: #4682B4;
-    --pattern-cell-highlight-outline: rgba(255,255,255,0.5);
+    --pattern-cell-highlight-outline: rgba(255,255,255,0.6);
     --pattern-cell-correct-bg: #20c997;
     --pattern-cell-wrong-bg: #dc3545; 
     --hud-text-color: #1c1c2e;
 }
-
-/* ... (بقیه کد CSS مثل قبل، شامل *, html, body, انیمیشن پس‌زمینه، هدر، دکمه‌های هدر، افکت نبض، لوگو، آمار، HUD مود چالشی ...) ... */
-/* ... فقط بخش‌های تغییر یافته یا جدید در ادامه می‌آیند ... */
 
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Vazirmatn', Arial, sans-serif; transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease; }
 html, body { width: 100%; height: 100%; overflow-x: hidden; }
@@ -133,8 +138,31 @@ body.day-mode .hud-heart.filled { color: #e84393; }
 .hud-heart.empty { color: var(--modal-secondary-text-color); opacity: 0.5; }
 
 main { display: flex; justify-content: center; align-items: center; flex-grow: 1; padding: 0 10px; }
-#game-board { border-collapse: separate; border-spacing: 8px; } /* حفظ فاصله برای تفکیک */
-td { width: 75px; height: 75px; perspective: 1000px; background-color: transparent; }
+#game-board { border-collapse: separate; /* default, but ensure */ } 
+
+/* Default td for memory game */
+.memory-board td { 
+    width: var(--base-cell-size-desktop); 
+    height: var(--base-cell-size-desktop); 
+    perspective: 1000px; 
+    background-color: transparent;
+}
+.memory-board { /* Table specific for memory game */
+    border-spacing: var(--base-cell-spacing-desktop);
+}
+
+
+/* td for pattern challenge game - smaller */
+.pattern-board td {
+    width: var(--pattern-cell-size-desktop);
+    height: var(--pattern-cell-size-desktop);
+    perspective: 1000px; /* Might not be needed if no 3D flip */
+    background-color: transparent;
+}
+.pattern-board { /* Table specific for pattern game */
+    border-spacing: var(--pattern-cell-spacing-desktop);
+}
+
 
 .card-inner {
     width: 100%; height: 100%;
@@ -152,7 +180,7 @@ td { width: 75px; height: 75px; perspective: 1000px; background-color: transpare
 
 .memory-card .card-inner { position: relative; transform-style: preserve-3d; }
 .memory-card .card-inner.is-flipped { transform: rotateY(180deg) scale(1) translateY(0) !important; transition: transform 0.7s; }
-.memory-card .card-inner.is-matched { opacity: 0.4 !important; cursor: default; box-shadow: 0 2px 5px var(--card-shadow-color); } /* تغییر opacity */
+.memory-card .card-inner.is-matched { opacity: 0.4 !important; cursor: default; box-shadow: 0 2px 5px var(--card-shadow-color); }
 .card-front, .card-back { position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; border-radius: 10px; display: flex; justify-content: center; align-items: center; }
 .card-front { background: linear-gradient(135deg, var(--card-front-gradient-start), var(--card-front-gradient-end)); }
 .card-back { background-color: var(--card-back-bg); transform: rotateY(180deg); }
@@ -167,15 +195,13 @@ td { width: 75px; height: 75px; perspective: 1000px; background-color: transpare
 .pattern-cell .card-inner.highlighted { 
     background-color: var(--pattern-cell-highlight-bg) !important; 
     transform: scale(1.05) translateY(0) !important; 
-    outline: 1px solid var(--pattern-cell-highlight-outline); /* اضافه کردن outline */
-    box-shadow: 0 0 10px var(--pattern-cell-highlight-bg); /* درخشش ملایم */
+    outline: 1px solid var(--pattern-cell-highlight-outline); 
+    box-shadow: 0 0 10px var(--pattern-cell-highlight-bg); 
 }
 .pattern-cell .card-inner.selected-correct { background-color: var(--pattern-cell-correct-bg) !important; }
 .pattern-cell .card-inner.selected-wrong { background-color: var(--pattern-cell-wrong-bg) !important; animation: shakeError 0.4s ease-in-out; }
 @keyframes shakeError { 0%, 100% { transform: translateX(0) scale(1) translateY(0); } 25% { transform: translateX(-5px) scale(1) translateY(0); } 75% { transform: translateX(5px) scale(1) translateY(0); } }
 
-/* ... (بقیه استایل‌های مودال، لیست مدال‌ها، Toast، فوتر، ریسپانسیو، و متغیر --cols مثل قبل و بدون تغییر عمده در این مرحله) ... */
-/* Overlay and Modal Styles */
 #overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.75); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
 body.day-mode #overlay { background-color: rgba(100, 100, 100, 0.5); }
 #modal-content { background-color: var(--modal-bg-flat); background-image: var(--modal-bg-gradient); color: var(--modal-text-color); padding: 30px 40px; border-radius: 15px; box-shadow: 0 10px 30px var(--modal-shadow-color); text-align: center; width: 90%; max-width: 550px; max-height: 90vh; display: flex; flex-direction: column; }
@@ -188,7 +214,6 @@ body.day-mode #overlay { background-color: rgba(100, 100, 100, 0.5); }
 #modal-content ul { padding-right: 0; margin-bottom: 15px; } 
 #modal-content ul li { list-style: none; text-align: right; padding: 8px 0; font-size: 1em; border-bottom: 1px solid var(--modal-list-border-color); }
 #modal-content ul li:last-child { border-bottom: none; }
-
 #modal-content button { border: none; border-radius: 25px; padding: 12px 25px; font-size: 1em; font-weight: 600; cursor: pointer; transition: background-color 0.3s ease, transform 0.2s ease; margin: 5px; min-width: 100px; box-shadow: 0 4px 8px var(--shadow-color); flex-shrink: 0; }
 #modal-content button:active { transform: translateY(0); }
 #modal-content button.general-modal-button, #modal-content #close-modal-button { background-color: var(--button-bg); color: var(--button-text-color); }
@@ -224,8 +249,10 @@ footer { width: 100%; text-align: center; padding: 20px 0; margin-top: auto; fon
     #game-stats, #pattern-challenge-hud { font-size: 0.9em; gap: 10px; }
     #game-stats span, #pattern-challenge-hud > div { padding: 6px 10px; }
     #hud-lives {font-size: 1.3em;}
-    td { width: 65px; height: 65px; }
-    .card-back p { font-size: 2.2em; }
+    .memory-board td { width: 65px; height: 65px; }
+    .pattern-board td { width: 50px; height: 50px; } /* کوچکتر برای مود چالشی در تبلت */
+    .card-back p { font-size: 2.2em; } /* برای کارت‌های حافظه */
+    .pattern-cell .card-inner { font-size: 1.8em; } /* اگر محتوایی داشت */
     #modal-content { padding: 20px; }
     #modal-content h2 { font-size: 1.8em; }
     #modal-content p { font-size: 1em; }
@@ -245,8 +272,11 @@ footer { width: 100%; text-align: center; padding: 20px 0; margin-top: auto; fon
     #game-stats, #pattern-challenge-hud { width: 100%; justify-content: space-around; margin-top: 5px; }
     #pattern-challenge-hud { padding: 8px 10px; font-size: 0.85em; }
     #hud-lives {font-size: 1.2em;}
-    #game-board { border-spacing: 5px; }
-    td { width: calc((100vw - 30px - (5px * (var(--cols, 6) - 1))) / var(--cols, 6)); height: calc((100vw - 30px - (5px * (var(--cols, 6) - 1))) / var(--cols, 6)); }
+    .memory-board { border-spacing: 5px; }
+    .memory-board td { width: calc((100vw - 30px - (5px * (var(--cols, 6) - 1))) / var(--cols, 6)); height: calc((100vw - 30px - (5px * (var(--cols, 6) - 1))) / var(--cols, 6)); }
+    .pattern-board { border-spacing: 4px; } /* فاصله کمتر برای خانه‌های کوچکتر */
+    .pattern-board td { width: calc((100vw - 30px - (4px * (var(--cols, 6) - 1))) / var(--cols, 6)); height: calc((100vw - 30px - (4px * (var(--cols, 6) - 1))) / var(--cols, 6)); }
+
     .card-back p { font-size: 1.6em; }
     #modal-content h2 { font-size: 1.5em; }
     #modal-content p { font-size: 0.9em; }
@@ -257,8 +287,11 @@ footer { width: 100%; text-align: center; padding: 20px 0; margin-top: auto; fon
     html[dir="ltr"] .achievement-item .icon { margin-left: 0; margin-right:10px; }
 }
 @media (max-width: 380px) { 
-    td { width: calc((100vw - 20px - (4px * (var(--cols, 6) - 1))) / var(--cols, 6)); height: calc((100vw - 20px - (4px * (var(--cols, 6) - 1))) / var(--cols, 6));}
-    #game-board {border-spacing: 4px; }
+    .memory-board td { width: calc((100vw - 20px - (4px * (var(--cols, 6) - 1))) / var(--cols, 6)); height: calc((100vw - 20px - (4px * (var(--cols, 6) - 1))) / var(--cols, 6));}
+    .memory-board {border-spacing: 4px; }
+    .pattern-board td { width: calc((100vw - 20px - (3px * (var(--cols, 6) - 1))) / var(--cols, 6)); height: calc((100vw - 20px - (3px * (var(--cols, 6) - 1))) / var(--cols, 6));}
+    .pattern-board {border-spacing: 3px; }
+
     .card-back p {font-size: 1.4em;}
     #header-buttons-left { gap: 5px; }
     #theme-toggle-button, #achievements-button, #music-toggle-button { font-size: 1.2em; padding: 3px 5px; min-width: 30px; min-height: 30px;}
@@ -269,4 +302,4 @@ footer { width: 100%; text-align: center; padding: 20px 0; margin-top: auto; fon
 #game-board[data-cols="5"] { --cols: 5; }
 #game-board[data-cols="6"] { --cols: 6; }
 
-                                                                  
+    

@@ -43,8 +43,8 @@
     --base-cell-size-desktop: 75px;
     --base-cell-spacing-desktop: 8px;
 
-    --pattern-cell-size-desktop: 45px; /* کوچکتر شد */
-    --pattern-cell-spacing-desktop: 8px; /* فاصله بیشتر شد */
+    --pattern-cell-size-desktop: 45px; 
+    --pattern-cell-spacing-desktop: 8px; 
     --pattern-cell-bg: rgba(255, 255, 255, 0.08); 
     --pattern-cell-highlight-bg: #00d9ff; 
     --pattern-cell-highlight-outline: rgba(0,0,0,0.4); 
@@ -97,8 +97,8 @@ body.day-mode {
     --hud-text-color: #1c1c2e;
 }
 
-/* ... (بقیه کد CSS شامل *, html, body, انیمیشن پس‌زمینه، هدر، دکمه‌ها، لوگو، آمار، HUD، مودال‌ها، مدال‌ها، Toast، فوتر و بخش ریسپانسیو مثل قبل) ... */
-/* ... فقط بخش‌های اصلاح شده یا مهم در ادامه آمده‌اند ... */
+/* ... (بقیه کد CSS از جمله *, html, body, انیمیشن پس‌زمینه، هدر، دکمه‌ها، مودال‌ها، مدال‌ها و غیره دقیقاً مثل پاسخ شماره ۳۴ (آخرین کد کامل CSS) خواهد بود، فقط بخش td ها و responsive آنها نیاز به بازبینی دارد.) ... */
+/* ... اطمینان حاصل کنید که تمام استایل‌های قبلی که به درستی کار می‌کردند، اینجا کپی شده باشند ... */
 
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Vazirmatn', Arial, sans-serif; transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease; }
 html, body { width: 100%; height: 100%; overflow-x: hidden; }
@@ -125,7 +125,7 @@ main { display: flex; justify-content: center; align-items: center; flex-grow: 1
 
 .memory-board td { width: var(--base-cell-size-desktop); height: var(--base-cell-size-desktop); perspective: 1000px; background-color: transparent; }
 .memory-board { border-spacing: var(--base-cell-spacing-desktop); }
-.pattern-board td { width: var(--pattern-cell-size-desktop); height: var(--pattern-cell-size-desktop); background-color: transparent; } /* perspective: 1000px; اگر انیمیشن 3D نیاز بود */
+.pattern-board td { width: var(--pattern-cell-size-desktop); height: var(--pattern-cell-size-desktop); background-color: transparent; }
 .pattern-board { border-spacing: var(--pattern-cell-spacing-desktop); }
 
 .card-inner { width: 100%; height: 100%; text-align: center; cursor: pointer; border-radius: 10px; opacity: 0; transform: scale(0.7) translateY(30px); transition: opacity 0.4s ease-out, transform 0.4s ease-out, background-color 0.2s ease, box-shadow 0.3s ease; box-shadow: 0 6px 12px var(--card-shadow-color); }
@@ -168,13 +168,11 @@ body.day-mode #overlay { background-color: rgba(100, 100, 100, 0.5); }
 html[dir="rtl"] .achievement-item { border-left: none; border-right: 5px solid var(--achievement-locked-border); }
 html[dir="ltr"] .achievement-item { border-right: none; border-left: 5px solid var(--achievement-locked-border); }
 .achievement-item .icon { font-size: 2.5em; flex-shrink: 0; }
-html[dir="rtl"] .achievement-item .icon { margin-left: 15px; }
-html[dir="ltr"] .achievement-item .icon { margin-right: 15px; }
+html[dir="rtl"] .achievement-item .icon { margin-left: 15px; } html[dir="ltr"] .achievement-item .icon { margin-right: 15px; }
 .achievement-item .details { flex-grow: 1; }
 .achievement-item .details h4 { margin: 0 0 5px 0; font-size: 1.2em; color: var(--modal-text-color); }
 .achievement-item .details p { margin: 0; font-size: 0.9em; color: var(--modal-secondary-text-color); line-height: 1.4; }
-.achievement-item.locked { opacity: 0.6; }
-.achievement-item.locked .icon { filter: grayscale(80%); }
+.achievement-item.locked { opacity: 0.6; } .achievement-item.locked .icon { filter: grayscale(80%); }
 .achievement-item.unlocked { opacity: 1; }
 html[dir="rtl"] .achievement-item.unlocked { border-right-color: var(--achievement-unlocked-border); }
 html[dir="ltr"] .achievement-item.unlocked { border-left-color: var(--achievement-unlocked-border); }
@@ -191,9 +189,8 @@ footer { width: 100%; text-align: center; padding: 20px 0; margin-top: auto; fon
     #game-stats span, #pattern-challenge-hud > div { padding: 6px 10px; }
     #hud-lives {font-size: 1.3em;}
     .memory-board td { width: 65px; height: 65px; }
-    .pattern-board td { width: 45px; height: 45px; } /* کوچکتر برای مود چالشی در تبلت */
+    .pattern-board td { width: 45px; height: 45px; } 
     .pattern-board { border-spacing: 6px; }
-
     .card-back p { font-size: 2.2em; } 
     #modal-content { padding: 20px; } #modal-content h2 { font-size: 1.8em; } #modal-content p { font-size: 1em; }
     #modal-content button { padding: 10px 20px; font-size: 0.9em;}
@@ -211,14 +208,10 @@ footer { width: 100%; text-align: center; padding: 20px 0; margin-top: auto; fon
     #game-stats, #pattern-challenge-hud { width: 100%; justify-content: space-around; margin-top: 5px; }
     #pattern-challenge-hud { padding: 8px 10px; font-size: 0.85em; }
     #hud-lives {font-size: 1.2em;}
-    
     .memory-board { border-spacing: 5px; }
     .memory-board td { width: calc((100vw - 30px - (5px * (var(--cols, 6) - 1))) / var(--cols, 6)); height: calc((100vw - 30px - (5px * (var(--cols, 6) - 1))) / var(--cols, 6)); }
-    
-    .pattern-board { border-spacing: 6px; } /* فاصله بیشتر برای مود چالشی در موبایل */
+    .pattern-board { border-spacing: 6px; } 
     .pattern-board td { width: calc((100vw - 40px - (6px * (var(--cols, 6) - 1))) / var(--cols, 6)); height: calc((100vw - 40px - (6px * (var(--cols, 6) - 1))) / var(--cols, 6)); }
-
-
     .card-back p { font-size: 1.6em; }
     #modal-content h2 { font-size: 1.5em; } #modal-content p { font-size: 0.9em; }
     #modal-content button { padding: 8px 15px; width: auto; min-width: 80px; font-size: 0.8em;}
@@ -229,9 +222,8 @@ footer { width: 100%; text-align: center; padding: 20px 0; margin-top: auto; fon
 @media (max-width: 380px) { 
     .memory-board td { width: calc((100vw - 20px - (4px * (var(--cols, 6) - 1))) / var(--cols, 6)); height: calc((100vw - 20px - (4px * (var(--cols, 6) - 1))) / var(--cols, 6));}
     .memory-board {border-spacing: 4px; }
-    .pattern-board td { width: calc((100vw - 20px - (5px * (var(--cols, 6) - 1))) / var(--cols, 6)); height: calc((100vw - 20px - (5px * (var(--cols, 6) - 1))) / var(--cols, 6));} /* فاصله بیشتر برای مود چالشی */
+    .pattern-board td { width: calc((100vw - 20px - (5px * (var(--cols, 6) - 1))) / var(--cols, 6)); height: calc((100vw - 20px - (5px * (var(--cols, 6) - 1))) / var(--cols, 6));} 
     .pattern-board {border-spacing: 5px; }
-
     .card-back p {font-size: 1.4em;}
     #header-buttons-left { gap: 5px; }
     #theme-toggle-button, #achievements-button, #music-toggle-button { font-size: 1.2em; padding: 3px 5px; min-width: 30px; min-height: 30px;}
@@ -241,4 +233,5 @@ footer { width: 100%; text-align: center; padding: 20px 0; margin-top: auto; fon
 #game-board[data-cols="4"] { --cols: 4; }
 #game-board[data-cols="5"] { --cols: 5; }
 #game-board[data-cols="6"] { --cols: 6; }
-                                       
+
+                   

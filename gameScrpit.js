@@ -384,7 +384,7 @@ $(document).ready(function() {
 
     // End of Part 1
 
-      // Start of Part 2
+        // Start of Part 2
 
     // --- Pattern Challenge Mode Logic ---
     function getPatternChallengeHighScore() {
@@ -650,6 +650,5 @@ $(document).ready(function() {
     showInitialModal(); 
 });
 // End of Part 2
-
 
                   

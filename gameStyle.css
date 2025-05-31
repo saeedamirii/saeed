@@ -234,4 +234,3 @@ footer { width: 100%; text-align: center; padding: 20px 0; margin-top: auto; fon
 #game-board[data-cols="5"] { --cols: 5; }
 #game-board[data-cols="6"] { --cols: 6; }
 
-                   

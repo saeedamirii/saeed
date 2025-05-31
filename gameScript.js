@@ -29,6 +29,7 @@ $(document).ready(function() {
     const hudScore = $('#hud-score');
     const hudLives = $('#hud-lives');
 
+    // --- Pattern Challenge Mode Variables ---
     let currentPatternStage = 1;
     let patternLives = 3;
     let patternScore = 0; 
@@ -38,8 +39,7 @@ $(document).ready(function() {
     let patternBoardLock = false; 
     const PATTERN_HIGHLIGHT_DURATION = 1000; // کاهش یافت به ۱ ثانیه
 
-    if (musicToggleButton.length && backgroundMusic) { /* ... (کد موسیقی مثل قبل) ... */ }
-    // --- Music Toggle Logic --- (کامل)
+    // --- Music Toggle Logic ---
     if (musicToggleButton.length && backgroundMusic) {
         musicToggleButton.on('click', function() {
             if (backgroundMusic.paused) {
@@ -55,9 +55,8 @@ $(document).ready(function() {
         });
     }
 
-    let achievements = { /* ... (کد مدال‌ها با شرایط اصلاح شده مثل قبل) ... */ };
-    // --- Achievements Logic --- (کامل با شرایط اصلاح شده برای مدال‌های حرکتی)
-    achievements = {
+    // --- Achievements Logic ---
+    let achievements = {
         'first_win':    { id: 'first_win',    name: 'اولین پیروزی',      description: 'اولین بازی حافظه (جفتی) خود را با موفقیت تمام کنید.', icon: '🥇', unlocked: false, check: () => totalGamesWon === 1 },
         'explorer_4x4': { id: 'explorer_4x4', name: 'کاشف باتجربه',     description: 'حالت بازی حافظه 4x4 را کامل کنید.',                              icon: '🗺️', unlocked: false, check: (mode) => mode === '4x4' },
         'master_6x6':   { id: 'master_6x6',   name: 'استاد بزرگ حافظه',  description: 'حالت بازی حافظه 6x6 را کامل کنید.',                              icon: '🏆', unlocked: false, check: (mode) => mode === '6x6' },
@@ -69,15 +68,100 @@ $(document).ready(function() {
         'strategist_5x6':{ id: 'strategist_5x6',name: 'استراتژیست برتر (بزرگ)', description: 'حالت حافظه 5x6 را با حداکثر ۲۳ حرکت کامل کنید.', icon: '🧭', unlocked: false, check: (mode, mvs) => mode === '5x6' && mvs <= 23 },
         'precision_6x6':{ id: 'precision_6x6', name: 'چالش دقت (حرفه‌ای)',description: 'حالت حافظه 6x6 را با حداکثر ۲۸ حرکت کامل کنید.', icon: '🎯', unlocked: false, check: (mode, mvs) => mode === '6x6' && mvs <= 28 }
     };
-    let consecutiveMatches = 0; let totalGamesWon = 0; let totalPairsEverFound = 0;
-    function loadStatsAndAchievements() { /* ... (مثل قبل) ... */ }
-    function saveStatsAndAchievements() { /* ... (مثل قبل) ... */ }
-    function showToast(message) { /* ... (مثل قبل) ... */ }
-    function unlockAchievement(id) { /* ... (مثل قبل) ... */ }
-    function checkAllAchievements(checkTime, param1, param2) { /* ... (مثل قبل) ... */ }
-    function displayAchievements() { /* ... (مثل قبل) ... */ }
-    achievementsButton.on('click', displayAchievements);
+    let consecutiveMatches = 0; 
+    let totalGamesWon = 0;      
+    let totalPairsEverFound = 0;
+
+    function loadStatsAndAchievements() {
+        const savedAchievements = JSON.parse(localStorage.getItem('memoryGameAchievementsStatus'));
+        if (savedAchievements) {
+            for (const id in achievements) {
+                if (achievements.hasOwnProperty(id) && savedAchievements[id] !== undefined) {
+                    achievements[id].unlocked = savedAchievements[id];
+                }
+            }
+        }
+        totalGamesWon = parseInt(localStorage.getItem('memoryGameTotalGamesWon')) || 0;
+        totalPairsEverFound = parseInt(localStorage.getItem('memoryGameTotalPairsEverFound')) || 0;
+    }
+
+    function saveStatsAndAchievements() {
+        let statuses = {};
+        for (const id in achievements) {
+            if (achievements.hasOwnProperty(id)) {
+                statuses[id] = achievements[id].unlocked;
+            }
+        }
+        localStorage.setItem('memoryGameAchievementsStatus', JSON.stringify(statuses));
+        localStorage.setItem('memoryGameTotalGamesWon', totalGamesWon);
+        localStorage.setItem('memoryGameTotalPairsEverFound', totalPairsEverFound);
+    }
     
+    function showToast(message) {
+        toastNotification.text(message);
+        toastNotification.addClass('show');
+        setTimeout(() => {
+            toastNotification.removeClass('show');
+        }, 3500);
+    }
+
+    function unlockAchievement(id) {
+        if (achievements[id] && !achievements[id].unlocked) {
+            achievements[id].unlocked = true;
+            showToast(`مدال "${achievements[id].name}" کسب شد! ${achievements[id].icon}`);
+            saveStatsAndAchievements(); 
+            if (overlay.is(':visible') && $('#achievements-list-container').length) { 
+                 displayAchievements();
+            }
+        }
+    }
+
+    function checkAllAchievements(checkTime, param1, param2) { 
+        if (activeGameType !== 'memory') return; 
+        for (const id in achievements) {
+            if (achievements.hasOwnProperty(id) && !achievements[id].unlocked) {
+                let conditionMet = false;
+                try { 
+                    if (checkTime === 'gameEnd') { 
+                        conditionMet = achievements[id].check(param1, param2); 
+                    } else if (checkTime === 'pairFound') { 
+                        if (typeof achievements[id].check === 'function' && achievements[id].check.length === 0) {
+                           conditionMet = achievements[id].check();
+                        }
+                    }
+                } catch (e) {
+                    console.error("Error checking achievement:", id, e, "Check function:", achievements[id].check);
+                }
+                if (conditionMet) {
+                    unlockAchievement(id);
+                }
+            }
+        }
+    }
+    
+    function displayAchievements() {
+        let listHTML = '<div id="achievements-list-container"><ul id="achievements-list">';
+        for (const id in achievements) {
+            if (achievements.hasOwnProperty(id)) {
+                const ach = achievements[id];
+                listHTML += `
+                    <li class="achievement-item ${ach.unlocked ? 'unlocked' : 'locked'}">
+                        <span class="icon">${ach.icon}</span>
+                        <div class="details">
+                            <h4>${ach.name}</h4>
+                            <p>${ach.description}</p>
+                        </div>
+                    </li>`;
+            }
+        }
+        listHTML += '</ul></div>';
+        
+        modalContent.html(`<h2>مدال‌ها و دستاوردها</h2>` + listHTML + '<button id="close-modal-button" class="general-modal-button" style="margin-top:20px; flex-shrink: 0;">بستن</button>');
+        overlay.fadeIn(300);
+    }
+    
+    achievementsButton.on('click', displayAchievements);
+
     function getHighScores() { /* ... (مثل قبل) ... */ }
     function saveHighScores(scores) { /* ... (مثل قبل) ... */ }
     function updateHighScore(mode, currentMoves, currentTimeInSeconds) { /* ... (مثل قبل) ... */ }
@@ -143,26 +227,24 @@ $(document).ready(function() {
 
     function determinePatternConfig(stage) {
         let rows, cols, numToHighlight;
-        // New N progression: N stays constant for 3 stages then increments
-        if (stage >= 1 && stage <= 7) { // 3x3 for 7 stages
-            rows = 3; cols = 3;
-            if (stage <= 3) numToHighlight = 3;      // Stages 1-3: N=3
-            else if (stage <= 6) numToHighlight = 4; // Stages 4-6: N=4
-            else numToHighlight = 5;                 // Stage 7: N=5
-        } else if (stage >= 8 && stage <= 16) { // 4x4 for 9 stages
+        // New N progression: N stays constant for ~3 stages then increments, 3x3 is one stage
+        if (stage === 1) { // 3x3 is only one stage
+            rows = 3; cols = 3; numToHighlight = 4; // Start with N=4 for 3x3 as it's quick
+        } else if (stage >= 2 && stage <= 10) { // 4x4 for 9 stages (stages 2 to 10)
             rows = 4; cols = 4;
-            if (stage <= 10) numToHighlight = 5;     // Stages 8-10: N=5
-            else if (stage <= 13) numToHighlight = 6;// Stages 11-13: N=6
-            else numToHighlight = 7;                // Stages 14-16: N=7
-        } else if (stage >= 17 && stage <= 25) { // 5x5 for 9 stages
+            if (stage <= 4) numToHighlight = 5;      // Stages 2-4 (3 stages): N=5
+            else if (stage <= 7) numToHighlight = 6; // Stages 5-7 (3 stages): N=6
+            else numToHighlight = 7;                 // Stages 8-10 (3 stages): N=7
+        } else if (stage >= 11 && stage <= 19) { // 5x5 for 9 stages (stages 11 to 19)
             rows = 5; cols = 5;
-            if (stage <= 19) numToHighlight = 7;     // Stages 17-19: N=7
-            else if (stage <= 22) numToHighlight = 8;// Stages 20-22: N=8
-            else numToHighlight = 9;                // Stages 23-25: N=9
-        } else { // Stages 26+ on 6x6
+            if (stage <= 13) numToHighlight = 7;     // Stages 11-13: N=7
+            else if (stage <= 16) numToHighlight = 8;// Stages 14-16: N=8
+            else numToHighlight = 9;                // Stages 17-19: N=9
+        } else { // Stages 20+ on 6x6
             rows = 6; cols = 6; 
-            numToHighlight = 9 + Math.floor(Math.max(0, stage - 26) / 3); 
-            numToHighlight = Math.min(numToHighlight, Math.floor(rows * cols * 0.60)); // Cap at ~60% of cells (e.g., 21 for 6x6)
+            // Starts at N=9, increases by 1 every 3 stages for 6x6
+            numToHighlight = 9 + Math.floor(Math.max(0, stage - 20) / 3); 
+            numToHighlight = Math.min(numToHighlight, Math.floor(rows * cols * 0.60)); 
             numToHighlight = Math.max(numToHighlight, 9); 
         }
         return { rows, cols, numToHighlight };
@@ -183,7 +265,10 @@ $(document).ready(function() {
         let allCellIndices = Array.from(Array(totalCells).keys());
         currentPatternToGuess = [];
         
-        for (let i = 0; i < config.numToHighlight; i++) {
+        // Ensure numToHighlight does not exceed totalCells
+        const actualNumToHighlight = Math.min(config.numToHighlight, totalCells);
+
+        for (let i = 0; i < actualNumToHighlight; i++) {
             if (allCellIndices.length === 0) break;
             let randIndex = Math.floor(Math.random() * allCellIndices.length);
             currentPatternToGuess.push(allCellIndices.splice(randIndex, 1)[0]);
@@ -270,7 +355,10 @@ $(document).ready(function() {
 
     function gameOverPatternChallenge() {
         patternBoardLock = true;
-        const completedStage = Math.max(0, currentPatternStage - (patternLives > 0 && playerPatternGuess.length === currentPatternToGuess.length ? 0 : 1) ); 
+        // If player lost on stage X, they completed X-1 stages. If they completed stage X and then lost on stage X+1, they completed X.
+        // PlayerPatternGuess might not be full if they lost life due to 3 mistakes before completing the pattern.
+        const completedStage = (patternLives > 0 && playerPatternGuess.length === currentPatternToGuess.length) ? currentPatternStage : Math.max(0, currentPatternStage -1) ;
+
         const newHighScore = savePatternChallengeHighScore(completedStage, patternScore); 
         const bestEver = getPatternChallengeHighScore();
 
@@ -281,7 +369,7 @@ $(document).ready(function() {
 
         let gameOverHTML = `
             <h2>بازی تمام شد! (چالش الگو)</h2>
-            <p>شما تا مرحله ${completedStageFarsi} پیش رفتید.</p>
+            <p>شما مرحله ${completedStageFarsi} را به اتمام رساندید.</p>
             <p>امتیاز نهایی شما: ${patternScoreFarsi}</p>
             <hr style="margin: 10px 0; border-color: var(--modal-list-border-color);">
             <p class="best-score-text">بهترین رکورد شما در چالش الگو:<br>مرحله ${bestStageFarsi} با امتیاز ${bestScoreTotalFarsi}</p>
@@ -334,9 +422,9 @@ $(document).ready(function() {
     }
 
     // Centralized event delegation for modal buttons
-    modalContent.off('click').on('click', '#mode-selection button, #close-modal-button', function() { // Combined listeners
+    modalContent.off('click').on('click', '#mode-selection button, #close-modal-button', function() { 
         const clickedButton = $(this);
-        if (clickedButton.is('#close-modal-button')) {
+        if (clickedButton.is('#close-modal-button')) { // Handles close for achievement modal
             overlay.fadeOut(300);
             return;
         }
@@ -366,5 +454,5 @@ $(document).ready(function() {
     showInitialModal(); 
 });
 // End of Part 2 of JavaScript
-                
+                                
                   

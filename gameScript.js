@@ -3,15 +3,15 @@ $(document).ready(function() {
     const em = ["💐","🌹","🌻","🏵️","🌺","🌴","🌈","🍓","🍒","🍎","🍉","🍊","🥭","🍍","🍋","🍏","🍐","🥝","🍇","🥥","🍅","🌶️","🍄","🧅","🥦","🥑","🍔","🍕","🧁","🎂","🍬","🍩","🍫","🎈"];
     let currentEmojis = [];
     let firstCard = null, secondCard = null;
-    let lockBoard = false; // Used by original memory game
+    let lockBoard = false; 
     let moves = 0;
     let matchesFound = 0;
     let totalPairs = 0;
     let timerInterval;
     let seconds = 0, minutes = 0;
     let currentGameTimeInSeconds = 0;
-    let gameMode = ""; // For original memory game modes like "3x4"
-    let activeGameType = null; // 'memory' or 'pattern'
+    let gameMode = ""; 
+    let activeGameType = null; 
 
     const themeToggleButton = $('#theme-toggle-button');
     const achievementsButton = $('#achievements-button');
@@ -23,8 +23,8 @@ $(document).ready(function() {
     const overlay = $('#overlay');
     const backgroundMusic = document.getElementById('background-music');
 
-    const gameStatsHUD = $('#game-stats'); // HUD for original game
-    const patternChallengeHUD = $('#pattern-challenge-hud'); // HUD for new game mode
+    const gameStatsHUD = $('#game-stats'); 
+    const patternChallengeHUD = $('#pattern-challenge-hud'); 
     const hudStage = $('#hud-stage');
     const hudScore = $('#hud-score');
     const hudLives = $('#hud-lives');
@@ -32,17 +32,13 @@ $(document).ready(function() {
     // --- Pattern Challenge Mode Variables ---
     let currentPatternStage = 1;
     let patternLives = 3;
-    let patternScore = 0; // Total correct cells clicked in current pattern game attempt
+    let patternScore = 0; 
     let mistakesThisPatternAttempt = 0;
     let currentPatternToGuess = [];
     let playerPatternGuess = [];
     let patternBoardLock = false; 
-    const PATTERN_HIGHLIGHT_DURATION = 2500; 
-    // Colors are now primarily handled by CSS variables
-    // const PATTERN_CELL_HIGHLIGHT_COLOR = 'var(--pattern-cell-highlight-bg)';
-    // const PATTERN_CELL_NORMAL_COLOR = 'var(--pattern-cell-bg)';
-    // const PATTERN_CELL_CORRECT_COLOR = 'var(--pattern-cell-correct-bg)';
-    // const PATTERN_CELL_WRONG_COLOR = 'var(--pattern-cell-wrong-bg)';
+    const PATTERN_HIGHLIGHT_DURATION = 2200; // کمی سریعتر کردم
+    // CSS variables handle colors now
 
     // --- Music Toggle Logic ---
     if (musicToggleButton.length && backgroundMusic) {
@@ -130,7 +126,9 @@ $(document).ready(function() {
                     if (checkTime === 'gameEnd') { 
                         conditionMet = achievements[id].check(param1, param2); 
                     } else if (checkTime === 'pairFound') { 
-                        conditionMet = achievements[id].check(); 
+                        if (typeof achievements[id].check === 'function' && achievements[id].check.length === 0) {
+                           conditionMet = achievements[id].check();
+                        }
                     }
                 } catch (e) {
                     console.error("Error checking achievement:", id, e, "Check function:", achievements[id].check);
@@ -164,7 +162,7 @@ $(document).ready(function() {
     }
     
     achievementsButton.on('click', displayAchievements);
-    // Event delegation for close button is now handled on modalContent globally later
+    // Event delegation for close button is now part of the global modalContent listeners
 
     // --- High Score Logic (For Original Memory Game) ---
     function getHighScores() {
@@ -206,7 +204,6 @@ $(document).ready(function() {
         }
     }
     const initialTheme = localStorage.getItem('memoryGameTheme') || 'night'; 
-    // applyTheme is called after loading stats, before showInitialModal
 
     themeToggleButton.on('click', function() {
         let currentTheme = bodyElement.hasClass('day-mode') ? 'day' : 'night';
@@ -216,7 +213,7 @@ $(document).ready(function() {
     });
 
     // --- Shared Game Logic & UI ---
-    function resetGameStats() { // For original memory game
+    function resetGameStats() { 
         moves = 0; matchesFound = 0; seconds = 0; minutes = 0; currentGameTimeInSeconds = 0;
         consecutiveMatches = 0; 
         $('#moves-display').text("حرکت‌ها: ۰");
@@ -224,7 +221,7 @@ $(document).ready(function() {
         if (timerInterval) clearInterval(timerInterval);
         lockBoard = false; firstCard = null; secondCard = null;
     }
-    function startTimer() { // For original memory game
+    function startTimer() { 
         if (timerInterval) clearInterval(timerInterval); 
         seconds = 0; minutes = 0; currentGameTimeInSeconds = 0; 
         $('#time-display').text(`زمان: ${formatTime(currentGameTimeInSeconds)}`); 
@@ -256,7 +253,6 @@ $(document).ready(function() {
             gameBoardElement.append(tr);
         }
         cardElements.forEach((card, index) => { setTimeout(() => { card.addClass('card-visible'); }, index * 60); });
-        // Attach click handler to dynamically created cards, ensuring it's specific to memory cards
         gameBoardElement.off('click', '.memory-card .card-inner').on('click', '.memory-card .card-inner', handleMemoryCardClick);
     }
     
@@ -374,16 +370,16 @@ $(document).ready(function() {
                 <button data-mode="4x5">حافظه 4x5</button> <button data-mode="5x6">حافظه 5x6</button>
                 <button data-mode="6x6">حافظه 6x6</button>
                 <hr style="margin: 10px 0; border-color: var(--modal-list-border-color);">
-                <button data-mode="pattern_challenge" class="challenge-button">چالش الگو</button>
-            </div>`;
+                <button data-mode="pattern_challenge" class="challenge-button general-modal-button">چالش الگو</button>
+            </div>`; // Added general-modal-button for consistent styling if needed
         setTimeout(() => {
             modalContent.html(modalHTML);
             overlay.fadeIn(500);
         }, 700);
     }
 
-    // End of Part 1
-      // Start of Part 2
+// End of Part 1 of JavaScript
+// Start of Part 2 of JavaScript
 
     // --- Pattern Challenge Mode Logic ---
     function getPatternChallengeHighScore() {
@@ -424,12 +420,14 @@ $(document).ready(function() {
         currentPatternStage = 1;
         patternLives = 3;
         patternScore = 0;
+        // mistakesThisPatternAttempt is reset in setupNextPatternStage
         setupNextPatternStage();
         overlay.fadeOut(300);
     }
 
     function determinePatternConfig(stage) {
         let rows, cols, numToHighlight;
+        // Using the agreed upon progression: 3x3 (3,3,4), 4x4 (4,4,5), 5x5 (5,5,6), then 6x6 with increasing N
         if (stage === 1) { rows=3; cols=3; numToHighlight=3; }
         else if (stage === 2) { rows=3; cols=3; numToHighlight=3; }
         else if (stage === 3) { rows=3; cols=3; numToHighlight=4; }
@@ -441,9 +439,9 @@ $(document).ready(function() {
         else if (stage === 9) { rows=5; cols=5; numToHighlight=6; }
         else { 
             rows=6; cols=6; 
-            numToHighlight = 6 + Math.floor((stage - 10) / 2); 
-            numToHighlight = Math.min(numToHighlight, Math.floor(rows * cols * 0.75)); // Cap at 75% of cells
-            numToHighlight = Math.max(numToHighlight, 6); // Ensure at least 6 for 6x6
+            numToHighlight = 6 + Math.floor(Math.max(0, stage - 10) / 2); // Starts at 6 for stage 10, increases by 1 every 2 stages
+            numToHighlight = Math.min(numToHighlight, Math.floor(rows * cols * 0.60)); // Cap at ~60% of cells
+            numToHighlight = Math.max(numToHighlight, 6); // Ensure at least 6 for 6x6 initial stages
         }
         return { rows, cols, numToHighlight };
     }
@@ -474,8 +472,6 @@ $(document).ready(function() {
             const tr = $('<tr></tr>');
             for (let c = 0; c < config.cols; c++) {
                 const cellId = (r * config.cols) + c;
-                // For pattern cells, we don't need complex front/back, just a single surface
-                // The .card-inner class is reused for consistent styling and animation hooks
                 const cellDiv = $(`<div class="card-inner pattern-cell-content"></div>`); 
                 const td = $('<td class="pattern-cell"></td>').attr('data-cell-id', cellId).append(cellDiv);
                 tr.append(td);
@@ -490,20 +486,19 @@ $(document).ready(function() {
             }, index * 40); 
         });
         
-        setTimeout(() => {
+        setTimeout(() => { // Wait for dealing animation to roughly complete
             currentPatternToGuess.forEach(cellId => {
                 $(`td[data-cell-id="${cellId}"] .card-inner`).addClass('highlighted');
             });
 
-            setTimeout(() => {
+            setTimeout(() => { // Duration for which pattern is shown
                 currentPatternToGuess.forEach(cellId => {
                     $(`td[data-cell-id="${cellId}"] .card-inner`).removeClass('highlighted');
                 });
                 patternBoardLock = false; 
             }, PATTERN_HIGHLIGHT_DURATION);
-        }, cellElementsForAnimation.length * 40 + 300); // Adjusted buffer
+        }, cellElementsForAnimation.length * 40 + 300); 
 
-        // Detach previous handlers and attach new ones to prevent multiple bindings
         gameBoardElement.off('click', '.pattern-cell').on('click', '.pattern-cell', handlePatternCellClick);
     }
 
@@ -513,34 +508,27 @@ $(document).ready(function() {
         const clickedCellTd = $(this);
         const cellInner = clickedCellTd.find('.card-inner');
 
-        // Prevent re-clicking already processed cells in this attempt
         if (cellInner.hasClass('selected-correct') || cellInner.hasClass('selected-wrong')) return;
 
         const cellId = parseInt(clickedCellTd.data('cell-id'));
 
-        if (currentPatternToGuess.includes(cellId) && !playerPatternGuess.includes(cellId)) {
+        if (currentPatternToGuess.includes(cellId)) { // Correct cell clicked (and not already guessed)
             playerPatternGuess.push(cellId);
             cellInner.addClass('selected-correct');
-            patternScore++;
+            patternScore++; // This is the cumulative score
             updatePatternHUD();
 
-            if (playerPatternGuess.length === currentPatternToGuess.length) {
+            if (playerPatternGuess.length === currentPatternToGuess.length) { // All pattern cells found
                 patternBoardLock = true; 
                 setTimeout(() => {
                     currentPatternStage++;
-                    setupNextPatternStage();
+                    setupNextPatternStage(); // Move to next stage
                 }, 600); 
             }
-        } else { 
+        } else { // Incorrect cell clicked (not part of the pattern)
             cellInner.addClass('selected-wrong');
             mistakesThisPatternAttempt++;
             
-            // Optional: remove 'selected-wrong' after a delay to allow re-selection if it was a mis-click on a correct but not-yet-selected cell
-            // For now, we'll leave it marked as wrong for this attempt.
-            // If you want it to revert so they can try again with the *same* highlighted pattern:
-            // setTimeout(() => { cellInner.removeClass('selected-wrong'); }, 800); 
-            // However, the rule is 3 mistakes -> lose life & new pattern. So marking it wrong is fine.
-
             if (mistakesThisPatternAttempt >= 3) {
                 patternLives--;
                 updatePatternHUD();
@@ -551,7 +539,8 @@ $(document).ready(function() {
                     setTimeout(() => {
                         const stageNumForToast = String(currentPatternStage).replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
                         showToast(`یک جان از دست دادید! الگوی جدید برای مرحله ${stageNumForToast}...`);
-                        setupNextPatternStage(); // New pattern for the same stage
+                        // Reset current attempt on same stage with new pattern
+                        setupNextPatternStage(); 
                     }, 1200);
                 }
             }
@@ -560,7 +549,8 @@ $(document).ready(function() {
 
     function gameOverPatternChallenge() {
         patternBoardLock = true;
-        const completedStage = currentPatternStage -1; // The stage number they actually completed or were on before losing
+        // Stage completed is currentPatternStage - 1, unless they lost on stage 1, then it's 0.
+        const completedStage = Math.max(0, currentPatternStage - (patternLives > 0 ? 1 : 0) ); 
         const newHighScore = savePatternChallengeHighScore(completedStage, patternScore); 
         const bestEver = getPatternChallengeHighScore();
 
@@ -630,24 +620,29 @@ $(document).ready(function() {
             startPatternChallengeMode();
         } else if (mode === 'main_menu') {
             showInitialModal(); 
-        } else { // Original memory game modes
+        } else { 
             const modeParts = mode.split('x');
-            if (modeParts.length === 2) { // Ensure it's a valid memory game mode string
+            if (modeParts.length === 2) { 
                 const r = parseInt(modeParts[0]);
                 const l = parseInt(modeParts[1]);
                 gameMode = mode; 
                 startMemoryGame(r, l);
             } else {
                 console.error("Invalid memory game mode selected:", mode);
+                showInitialModal(); // Fallback to main menu if mode is unknown
             }
         }
     });
+    modalContent.off('click', '#close-modal-button').on('click', '#close-modal-button', function() { // Also delegate close button for achievement modal
+        overlay.fadeOut(300);
+    });
+
 
     // --- Initial Load ---
     loadStatsAndAchievements();
     applyTheme(initialTheme); 
     showInitialModal(); 
 });
-// End of Part 2
-          
-                                                  
+// End of Part 2 of JavaScript
+                
+                  

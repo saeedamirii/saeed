@@ -37,35 +37,27 @@ $(document).ready(function() {
     let currentPatternToGuess = [];
     let playerPatternGuess = [];
     let patternBoardLock = false; 
-    const PATTERN_HIGHLIGHT_DURATION = 1000; // ۱ ثانیه - طبق آخرین درخواست
+    const PATTERN_HIGHLIGHT_DURATION = 1200; // کاهش یافت به ۱.۲ ثانیه
 
     // --- Music Toggle Logic ---
     if (musicToggleButton.length && backgroundMusic) {
         musicToggleButton.on('click', function() {
-            try {
-                if (backgroundMusic.paused) {
-                    backgroundMusic.play()
-                        .then(() => {
-                            musicToggleButton.text('⏸️').attr('title', 'قطع موزیک').addClass('pulsating-music');
-                        })
-                        .catch(error => {
-                             console.error("Error playing music:", error);
-                             // Fallback for browsers that might have issues with play() promise
-                             musicToggleButton.text('⏸️').attr('title', 'قطع موزیک').addClass('pulsating-music');
-                        });
-                } else {
-                    backgroundMusic.pause();
-                    musicToggleButton.text('🎵').attr('title', 'پخش موزیک').removeClass('pulsating-music');
-                }
-            } catch (e) {
-                console.error("Error in music toggle:", e);
+            if (backgroundMusic.paused) {
+                backgroundMusic.play()
+                    .then(() => {
+                        musicToggleButton.text('⏸️').attr('title', 'قطع موزیک').addClass('pulsating-music');
+                    })
+                    .catch(error => console.error("Error playing music:", error));
+            } else {
+                backgroundMusic.pause();
+                musicToggleButton.text('🎵').attr('title', 'پخش موزیک').removeClass('pulsating-music');
             }
         });
     }
 
     // --- Achievements Logic ---
     let achievements = {
-        'first_win':    { id: 'first_win',    name: 'اولین پیروزی',      description: 'اولین بازی حافظه (جفتی) خود را با موفقیت تمام کنید.', icon: '🥇', unlocked: false, check: () => totalGamesWon >= 1 }, // Changed to >= 1 for robustness
+        'first_win':    { id: 'first_win',    name: 'اولین پیروزی',      description: 'اولین بازی حافظه (جفتی) خود را با موفقیت تمام کنید.', icon: '🥇', unlocked: false, check: () => totalGamesWon === 1 },
         'explorer_4x4': { id: 'explorer_4x4', name: 'کاشف باتجربه',     description: 'حالت بازی حافظه 4x4 را کامل کنید.',                              icon: '🗺️', unlocked: false, check: (mode) => mode === '4x4' },
         'master_6x6':   { id: 'master_6x6',   name: 'استاد بزرگ حافظه',  description: 'حالت بازی حافظه 6x6 را کامل کنید.',                              icon: '🏆', unlocked: false, check: (mode) => mode === '6x6' },
         'combo_3':      { id: 'combo_3',      name: 'ضربات متوالی',      description: 'در بازی حافظه، ۳ جفت را پشت سر هم و بدون اشتباه پیدا کنید.', icon: '⚡', unlocked: false, check: () => consecutiveMatches >= 3 },
@@ -80,45 +72,160 @@ $(document).ready(function() {
     let totalGamesWon = 0;      
     let totalPairsEverFound = 0;
 
-    function loadStatsAndAchievements() { /* ... (مثل قبل، بدون تغییر عمده) ... */ }
-    function saveStatsAndAchievements() { /* ... (مثل قبل، بدون تغییر عمده) ... */ }
-    function showToast(message) { /* ... (مثل قبل، بدون تغییر عمده) ... */ }
-    function unlockAchievement(id) { /* ... (مثل قبل، بدون تغییر عمده) ... */ }
-    function checkAllAchievements(checkTime, param1, param2) { /* ... (مثل قبل، بدون تغییر عمده) ... */ }
-    function displayAchievements() { /* ... (مثل قبل، بدون تغییر عمده) ... */ }
-    if (achievementsButton.length) achievementsButton.on('click', displayAchievements);
+    function loadStatsAndAchievements() {
+        const savedAchievements = JSON.parse(localStorage.getItem('memoryGameAchievementsStatus'));
+        if (savedAchievements) {
+            for (const id in achievements) {
+                if (achievements.hasOwnProperty(id) && savedAchievements[id] !== undefined) {
+                    achievements[id].unlocked = savedAchievements[id];
+                }
+            }
+        }
+        totalGamesWon = parseInt(localStorage.getItem('memoryGameTotalGamesWon')) || 0;
+        totalPairsEverFound = parseInt(localStorage.getItem('memoryGameTotalPairsEverFound')) || 0;
+    }
+
+    function saveStatsAndAchievements() {
+        let statuses = {};
+        for (const id in achievements) {
+            if (achievements.hasOwnProperty(id)) {
+                statuses[id] = achievements[id].unlocked;
+            }
+        }
+        localStorage.setItem('memoryGameAchievementsStatus', JSON.stringify(statuses));
+        localStorage.setItem('memoryGameTotalGamesWon', totalGamesWon);
+        localStorage.setItem('memoryGameTotalPairsEverFound', totalPairsEverFound);
+    }
     
-    function getHighScores() { /* ... (مثل قبل، بدون تغییر عمده) ... */ }
-    function saveHighScores(scores) { /* ... (مثل قبل، بدون تغییر عمده) ... */ }
-    function updateHighScore(mode, currentMoves, currentTimeInSeconds) { /* ... (مثل قبل، بدون تغییر عمده) ... */ }
-    function formatTime(totalSeconds) { /* ... (مثل قبل، بدون تغییر عمده) ... */ }
-    function applyTheme(theme) { /* ... (مثل قبل، بدون تغییر عمده) ... */ }
+    function showToast(message) {
+        toastNotification.text(message);
+        toastNotification.addClass('show');
+        setTimeout(() => {
+            toastNotification.removeClass('show');
+        }, 3500);
+    }
+
+    function unlockAchievement(id) {
+        if (achievements[id] && !achievements[id].unlocked) {
+            achievements[id].unlocked = true;
+            showToast(`مدال "${achievements[id].name}" کسب شد! ${achievements[id].icon}`);
+            saveStatsAndAchievements(); 
+            if (overlay.is(':visible') && $('#achievements-list-container').length) { 
+                 displayAchievements();
+            }
+        }
+    }
+
+    function checkAllAchievements(checkTime, param1, param2) { 
+        if (activeGameType !== 'memory') return; 
+        for (const id in achievements) {
+            if (achievements.hasOwnProperty(id) && !achievements[id].unlocked) {
+                let conditionMet = false;
+                try { 
+                    if (checkTime === 'gameEnd') { 
+                        conditionMet = achievements[id].check(param1, param2); 
+                    } else if (checkTime === 'pairFound') { 
+                        if (typeof achievements[id].check === 'function' && achievements[id].check.length === 0) {
+                           conditionMet = achievements[id].check();
+                        }
+                    }
+                } catch (e) {
+                    console.error("Error checking achievement:", id, e, "Check function:", achievements[id].check);
+                }
+                if (conditionMet) {
+                    unlockAchievement(id);
+                }
+            }
+        }
+    }
+    
+    function displayAchievements() {
+        let listHTML = '<div id="achievements-list-container"><ul id="achievements-list">';
+        for (const id in achievements) {
+            if (achievements.hasOwnProperty(id)) {
+                const ach = achievements[id];
+                listHTML += `
+                    <li class="achievement-item ${ach.unlocked ? 'unlocked' : 'locked'}">
+                        <span class="icon">${ach.icon}</span>
+                        <div class="details">
+                            <h4>${ach.name}</h4>
+                            <p>${ach.description}</p>
+                        </div>
+                    </li>`;
+            }
+        }
+        listHTML += '</ul></div>';
+        
+        modalContent.html(`<h2>مدال‌ها و دستاوردها</h2>` + listHTML + '<button id="close-modal-button" class="general-modal-button" style="margin-top:20px; flex-shrink: 0;">بستن</button>');
+        overlay.fadeIn(300);
+    }
+    
+    achievementsButton.on('click', displayAchievements);
+
+    function getHighScores() {
+        const scores = localStorage.getItem('memoryGameHighScores');
+        return scores ? JSON.parse(scores) : {};
+    }
+    function saveHighScores(scores) {
+        localStorage.setItem('memoryGameHighScores', JSON.stringify(scores));
+    }
+    function updateHighScore(mode, currentMoves, currentTimeInSeconds) {
+        const highScores = getHighScores();
+        const currentBest = highScores[mode];
+        let newRecordString = "";
+        if (!currentBest || currentMoves < currentBest.moves || (currentMoves === currentBest.moves && currentTimeInSeconds < currentBest.timeInSeconds)) {
+            highScores[mode] = { moves: currentMoves, timeInSeconds: currentTimeInSeconds };
+            saveHighScores(highScores);
+            newRecordString = "🎉 رکورد جدید! 🎉";
+        }
+        return newRecordString;
+    }
+    function formatTime(totalSeconds) {
+        const m = Math.floor(totalSeconds / 60);
+        const s = totalSeconds % 60;
+        const displayM = String(m).padStart(2, '۰').replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+        const displayS = String(s).padStart(2, '۰').replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+        return `${displayM}:${displayS}`;
+    }
+
+    function applyTheme(theme) {
+        if (theme === 'day') {
+            bodyElement.addClass('day-mode');
+            themeToggleButton.text('☀️').attr('title', 'تغییر به تم شب');
+        } else {
+            bodyElement.removeClass('day-mode');
+            themeToggleButton.text('🌙').attr('title', 'تغییر به تم روز');
+        }
+    }
     const initialTheme = localStorage.getItem('memoryGameTheme') || 'night'; 
-    if (themeToggleButton.length) themeToggleButton.on('click', function() { /* ... (مثل قبل، بدون تغییر عمده) ... */ });
-    
+
+    themeToggleButton.on('click', function() {
+        let currentTheme = bodyElement.hasClass('day-mode') ? 'day' : 'night';
+        const newTheme = (currentTheme === 'day' ? 'night' : 'day');
+        applyTheme(newTheme);
+        localStorage.setItem('memoryGameTheme', newTheme);
+    });
+
     function resetGameStats() { 
         moves = 0; matchesFound = 0; seconds = 0; minutes = 0; currentGameTimeInSeconds = 0;
         consecutiveMatches = 0; 
-        if (gameStatsHUD.length) { // اطمینان از وجود عنصر
-            $('#moves-display').text("حرکت‌ها: ۰");
-            $('#time-display').text("زمان: ۰۰:۰۰");
-        }
+        $('#moves-display').text("حرکت‌ها: ۰");
+        $('#time-display').text("زمان: ۰۰:۰۰");
         if (timerInterval) clearInterval(timerInterval);
         lockBoard = false; firstCard = null; secondCard = null;
     }
     function startTimer() { 
         if (timerInterval) clearInterval(timerInterval); 
         seconds = 0; minutes = 0; currentGameTimeInSeconds = 0; 
-        if (gameStatsHUD.length) $('#time-display').text(`زمان: ${formatTime(currentGameTimeInSeconds)}`); 
+        $('#time-display').text(`زمان: ${formatTime(currentGameTimeInSeconds)}`); 
         timerInterval = setInterval(function() {
             seconds++; currentGameTimeInSeconds++;
             if (seconds === 60) { minutes++; seconds = 0; }
-            if (gameStatsHUD.length) $('#time-display').text(`زمان: ${formatTime(currentGameTimeInSeconds)}`);
+            $('#time-display').text(`زمان: ${formatTime(currentGameTimeInSeconds)}`);
         }, 1000);
     }
 
     function createMemoryBoard(rows, cols) {
-        if (!gameBoardElement.length) return;
         gameBoardElement.html(''); 
         gameBoardElement.attr('data-cols', cols);
         gameBoardElement.removeClass('pattern-board').addClass('memory-board'); 
@@ -141,10 +248,9 @@ $(document).ready(function() {
     }
     
     function startMemoryGame(r, l) {
-        console.log("Starting Memory Game:", r + "x" + l);
         activeGameType = 'memory';
-        if (patternChallengeHUD.length) patternChallengeHUD.hide();
-        if (gameStatsHUD.length) gameStatsHUD.show();
+        patternChallengeHUD.hide();
+        gameStatsHUD.show();
         resetGameStats(); 
         totalPairs = (r * l) / 2;
         let availableEmojis = [...em]; 
@@ -167,12 +273,12 @@ $(document).ready(function() {
         }
         createMemoryBoard(r, l); 
         startTimer(); 
-        if (overlay.length) overlay.fadeOut(300);
+        overlay.fadeOut(300);
     }
     
     function incrementMemoryMoves(count = 1) { 
         moves += count;
-        if (gameStatsHUD.length) $('#moves-display').text(`حرکت‌ها: ${String(moves).replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[d])}`);
+        $('#moves-display').text(`حرکت‌ها: ${String(moves).replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[d])}`);
     }
 
     function handleMemoryCardClick() {
@@ -195,13 +301,58 @@ $(document).ready(function() {
         }
     }
 
-    function disableMemoryCards() { /* ... (مثل قبل، بدون تغییر عمده) ... */ }
-    function unflipMemoryCards() { /* ... (مثل قبل، بدون تغییر عمده) ... */ }
-    function resetMemoryTurn() { /* ... (مثل قبل، بدون تغییر عمده) ... */ }
-    function endMemoryGame() { /* ... (مثل قبل، بدون تغییر عمده، فقط نام دکمه چالش الگو در مودال پایانی ممکن است نیاز به بررسی داشته باشد) ... */ }
+    function disableMemoryCards() {
+        firstCard.addClass('is-matched'); secondCard.addClass('is-matched');
+        matchesFound++; consecutiveMatches++; totalPairsEverFound++;
+        saveStatsAndAchievements(); 
+        checkAllAchievements('pairFound');
+        resetMemoryTurn();
+        if (matchesFound === totalPairs) { endMemoryGame(); }
+    }
 
+    function unflipMemoryCards() {
+        consecutiveMatches = 0; 
+        setTimeout(() => {
+            if (firstCard) firstCard.removeClass('is-flipped');
+            if (secondCard) secondCard.removeClass('is-flipped');
+            resetMemoryTurn();
+        }, 1200);
+    }
+
+    function resetMemoryTurn() {
+        [firstCard, secondCard] = [null, null]; lockBoard = false;
+    }
+
+    function endMemoryGame() {
+        clearInterval(timerInterval); totalGamesWon++; 
+        saveStatsAndAchievements(); 
+        const timeTakenDisplayString = formatTime(currentGameTimeInSeconds);
+        const newRecordMessage = updateHighScore(gameMode, moves, currentGameTimeInSeconds); 
+        const highScores = getHighScores();
+        const bestScoreForMode = highScores[gameMode];
+        let bestScoreDisplayString = "هنوز رکوردی برای این حالت ثبت نشده.";
+        if (bestScoreForMode) {
+            bestScoreDisplayString = `بهترین رکورد: ${String(bestScoreForMode.moves).replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[d])} حرکت در ${formatTime(bestScoreForMode.timeInSeconds)}`;
+        }
+        const movesDisplayString = String(moves).replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+        checkAllAchievements('gameEnd', gameMode, moves); 
+        const modalHTML = `
+            <h2 class="${newRecordMessage ? 'record-message' : ''}">${newRecordMessage ? newRecordMessage : "تبریک! شما برنده شدید!"}</h2>
+            <p>شما حالت ${gameMode.replace('x', ' در ')} را با ${movesDisplayString} حرکت به پایان رساندید.</p>
+            <p>زمان شما: ${timeTakenDisplayString}</p>
+            <p class="best-score-text">${bestScoreDisplayString}</p>
+            <p style="font-size:1.1em; margin-top: 25px; margin-bottom: 15px;">دوباره بازی می‌کنید؟</p>
+            <div id="mode-selection">
+                <button data-mode="3x4">حافظه 3x4</button> <button data-mode="4x4">حافظه 4x4</button>
+                <button data-mode="4x5">حافظه 4x5</button> <button data-mode="5x6">حافظه 5x6</button>
+                <button data-mode="6x6">حافظه 6x6</button>
+                <hr style="margin: 10px 0; border-color: var(--modal-list-border-color);">
+                <button data-mode="pattern_challenge" class="challenge-button general-modal-button">چالش الگو</button>
+            </div>`;
+        setTimeout(() => { modalContent.html(modalHTML); overlay.fadeIn(500); }, 700);
+    }
 // End of Part 1 of JavaScript
-            // Start of Part 2 of JavaScript
+        // Start of Part 2 of JavaScript
 
     // --- Pattern Challenge Mode Logic ---
     function getPatternChallengeHighScore() {
@@ -211,57 +362,62 @@ $(document).ready(function() {
     function savePatternChallengeHighScore(stage, totalScore) {
         const currentHighScore = getPatternChallengeHighScore();
         let newRecord = false;
-        if (stage > currentHighScore.maxStage) { newRecord = true; } 
-        else if (stage === currentHighScore.maxStage && totalScore > currentHighScore.maxScore) { newRecord = true; }
-        if (newRecord) { localStorage.setItem('patternChallengeHighScore', JSON.stringify({ maxStage: stage, maxScore: totalScore })); }
+        if (stage > currentHighScore.maxStage) {
+            newRecord = true;
+        } else if (stage === currentHighScore.maxStage && totalScore > currentHighScore.maxScore) {
+            newRecord = true;
+        }
+        if (newRecord) {
+             localStorage.setItem('patternChallengeHighScore', JSON.stringify({ maxStage: stage, maxScore: totalScore }));
+        }
         return newRecord;
     }
 
     function updatePatternHUD() {
-        if (hudStage.length) hudStage.text(String(currentPatternStage).replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]));
-        if (hudScore.length) hudScore.text(String(patternScore).replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]));
-        if (hudLives.length) {
-            let heartsHTML = "";
-            for (let i = 0; i < 3; i++) {
-                heartsHTML += `<span class="hud-heart ${i < patternLives ? 'filled' : 'empty'}">❤️</span>`;
-            }
-            hudLives.html(heartsHTML);
+        hudStage.text(String(currentPatternStage).replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]));
+        hudScore.text(String(patternScore).replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]));
+        let heartsHTML = "";
+        for (let i = 0; i < 3; i++) {
+            heartsHTML += `<span class="hud-heart ${i < patternLives ? 'filled' : 'empty'}">❤️</span>`;
         }
+        hudLives.html(heartsHTML);
     }
 
     function startPatternChallengeMode() {
-        console.log("Starting Pattern Challenge Mode");
         activeGameType = 'pattern';
-        if(gameStatsHUD.length) gameStatsHUD.hide();
-        if(patternChallengeHUD.length) patternChallengeHUD.show();
+        gameStatsHUD.hide();
+        patternChallengeHUD.show();
         if(timerInterval) clearInterval(timerInterval); 
-
         currentPatternStage = 1;
         patternLives = 3;
         patternScore = 0; 
         setupNextPatternStage();
-        if(overlay.length) overlay.fadeOut(300);
+        overlay.fadeOut(300);
     }
 
     function determinePatternConfig(stage) {
         let rows, cols, numToHighlight;
-        // New N progression: 3x3 is 1 stage, 4x4 & 5x5 are 9 stages each, N increases every 3 stages within tier
-        if (stage === 1) { 
-            rows = 3; cols = 3; numToHighlight = 4; 
-        } else if (stage >= 2 && stage <= 10) { // 4x4 for 9 stages (stages 2 to 10)
+        // New progression: N stays constant for 3 stages then increments
+        if (stage >= 1 && stage <= 7) { // 3x3 for 7 stages
+            rows = 3; cols = 3;
+            if (stage <= 3) numToHighlight = 3;      // Stages 1-3: N=3
+            else if (stage <= 6) numToHighlight = 4; // Stages 4-6: N=4
+            else numToHighlight = 5;                 // Stage 7: N=5
+        } else if (stage >= 8 && stage <= 14) { // 4x4 for 7 stages
             rows = 4; cols = 4;
-            if (stage <= 4) numToHighlight = 5;      // Stages 2-4 (3 stages): N=5
-            else if (stage <= 7) numToHighlight = 6; // Stages 5-7 (3 stages): N=6
-            else numToHighlight = 7;                 // Stages 8-10 (3 stages): N=7
-        } else if (stage >= 11 && stage <= 19) { // 5x5 for 9 stages (stages 11 to 19)
+            if (stage <= 10) numToHighlight = 5;     // Stages 8-10: N=5
+            else if (stage <= 13) numToHighlight = 6;// Stages 11-13: N=6
+            else numToHighlight = 7;                // Stage 14: N=7
+        } else if (stage >= 15 && stage <= 21) { // 5x5 for 7 stages
             rows = 5; cols = 5;
-            if (stage <= 13) numToHighlight = 7;     // Stages 11-13: N=7
-            else if (stage <= 16) numToHighlight = 8;// Stages 14-16: N=8
-            else numToHighlight = 9;                // Stages 17-19: N=9
-        } else { // Stages 20+ on 6x6
+            if (stage <= 17) numToHighlight = 7;     // Stages 15-17: N=7
+            else if (stage <= 20) numToHighlight = 8;// Stages 18-20: N=8
+            else numToHighlight = 9;                // Stage 21: N=9
+        } else { // Stages 22+ on 6x6
             rows = 6; cols = 6; 
-            numToHighlight = 9 + Math.floor(Math.max(0, stage - 20) / 3); 
-            numToHighlight = Math.min(numToHighlight, Math.floor(rows * cols * 0.66)); // Cap at ~66% of cells (e.g., 23-24 for 6x6)
+            // Starts at N=9, increases by 1 every 3 stages for 6x6
+            numToHighlight = 9 + Math.floor(Math.max(0, stage - 22) / 3); 
+            numToHighlight = Math.min(numToHighlight, Math.floor(rows * cols * 0.66)); // Cap at ~66% of cells (e.g., 24 for 6x6)
             numToHighlight = Math.max(numToHighlight, 9); 
         }
         return { rows, cols, numToHighlight };
@@ -274,7 +430,6 @@ $(document).ready(function() {
         updatePatternHUD();
 
         const config = determinePatternConfig(currentPatternStage);
-        if (!gameBoardElement.length) { console.error("#game-board not found for pattern stage!"); return; }
         gameBoardElement.html('');
         gameBoardElement.attr('data-cols', config.cols);
         gameBoardElement.removeClass('memory-board').addClass('pattern-board');
@@ -283,8 +438,7 @@ $(document).ready(function() {
         let allCellIndices = Array.from(Array(totalCells).keys());
         currentPatternToGuess = [];
         
-        const actualNumToHighlight = Math.min(config.numToHighlight, totalCells);
-        for (let i = 0; i < actualNumToHighlight; i++) {
+        for (let i = 0; i < config.numToHighlight; i++) {
             if (allCellIndices.length === 0) break;
             let randIndex = Math.floor(Math.random() * allCellIndices.length);
             currentPatternToGuess.push(allCellIndices.splice(randIndex, 1)[0]);
@@ -304,31 +458,35 @@ $(document).ready(function() {
         }
         
         cellElementsForAnimation.forEach((cell, index) => {
-            setTimeout(() => { cell.addClass('card-visible'); }, index * 30); 
+            setTimeout(() => {
+                cell.addClass('card-visible'); 
+            }, index * 30); // Slightly faster dealing for pattern cells
         });
         
-        // Ensure dealing animation completes before highlighting
-        const dealingTotalTime = cellElementsForAnimation.length * 30 + 250;
         setTimeout(() => { 
             currentPatternToGuess.forEach(cellId => {
                 $(`td[data-cell-id="${cellId}"] .card-inner`).addClass('highlighted');
             });
+
             setTimeout(() => { 
                 currentPatternToGuess.forEach(cellId => {
                     $(`td[data-cell-id="${cellId}"] .card-inner`).removeClass('highlighted');
                 });
                 patternBoardLock = false; 
-            }, PATTERN_HIGHLIGHT_DURATION);
-        }, dealingTotalTime); 
+            }, PATTERN_HIGHLIGHT_DURATION); // PATTERN_HIGHLIGHT_DURATION is 1200ms
+        }, cellElementsForAnimation.length * 30 + 250); // Adjusted buffer for dealing
 
         gameBoardElement.off('click', '.pattern-cell').on('click', '.pattern-cell', handlePatternCellClick);
     }
 
     function handlePatternCellClick() {
         if (patternBoardLock) return;
+        
         const clickedCellTd = $(this);
         const cellInner = clickedCellTd.find('.card-inner');
+
         if (cellInner.hasClass('selected-correct') || cellInner.hasClass('selected-wrong')) return;
+
         const cellId = parseInt(clickedCellTd.data('cell-id'));
 
         if (currentPatternToGuess.includes(cellId)) { 
@@ -336,15 +494,22 @@ $(document).ready(function() {
             cellInner.addClass('selected-correct');
             patternScore++; 
             updatePatternHUD();
+
             if (playerPatternGuess.length === currentPatternToGuess.length) { 
                 patternBoardLock = true; 
-                setTimeout(() => { currentPatternStage++; setupNextPatternStage(); }, 600); 
+                setTimeout(() => {
+                    currentPatternStage++;
+                    setupNextPatternStage(); 
+                }, 500); // Short delay before next stage starts
             }
         } else { 
             cellInner.addClass('selected-wrong');
             mistakesThisPatternAttempt++;
+            
             if (mistakesThisPatternAttempt >= 3) {
-                patternLives--; updatePatternHUD(); patternBoardLock = true; 
+                patternLives--;
+                updatePatternHUD();
+                patternBoardLock = true; 
                 if (patternLives <= 0) {
                     gameOverPatternChallenge();
                 } else {
@@ -360,9 +525,10 @@ $(document).ready(function() {
 
     function gameOverPatternChallenge() {
         patternBoardLock = true;
-        const completedStage = Math.max(0, currentPatternStage - 1 ); // Stage they were on before losing/failing it
+        const completedStage = Math.max(0, currentPatternStage - 1 ); 
         const newHighScore = savePatternChallengeHighScore(completedStage, patternScore); 
         const bestEver = getPatternChallengeHighScore();
+
         const completedStageFarsi = String(completedStage).replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
         const patternScoreFarsi = String(patternScore).replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
         const bestStageFarsi = String(bestEver.maxStage).replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
@@ -370,7 +536,7 @@ $(document).ready(function() {
 
         let gameOverHTML = `
             <h2>بازی تمام شد! (چالش الگو)</h2>
-            <p>شما مرحله ${completedStageFarsi} را به اتمام رساندید و یا در آن بودید.</p>
+            <p>شما تا مرحله ${completedStageFarsi} پیش رفتید.</p>
             <p>امتیاز نهایی شما: ${patternScoreFarsi}</p>
             <hr style="margin: 10px 0; border-color: var(--modal-list-border-color);">
             <p class="best-score-text">بهترین رکورد شما در چالش الگو:<br>مرحله ${bestStageFarsi} با امتیاز ${bestScoreTotalFarsi}</p>
@@ -381,17 +547,17 @@ $(document).ready(function() {
                 <hr style="margin: 10px 0; border-color: var(--modal-list-border-color);">
                 <button data-mode="main_menu" class="general-modal-button">منوی اصلی</button> 
             </div>`;
-        if (modalContent.length && overlay.length) {
-            modalContent.html(gameOverHTML); overlay.fadeIn(500);
-        }
+        
+        modalContent.html(gameOverHTML);
+        overlay.fadeIn(500);
     }
 
+    // --- Initial Modal Setup & Main Menu Logic ---
     function showInitialModal() {
-        console.log("Showing Initial Modal");
         activeGameType = null; 
-        if (patternChallengeHUD.length) patternChallengeHUD.hide();
-        if (gameStatsHUD.length) gameStatsHUD.hide(); 
-        if(timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+        patternChallengeHUD.hide();
+        gameStatsHUD.hide(); 
+        if(timerInterval) clearInterval(timerInterval);
 
         const modalHTML = `
             <div id="inst">
@@ -410,59 +576,46 @@ $(document).ready(function() {
                 <p style="font-size:1.2em; font-weight: bold; margin-top: 25px; margin-bottom: 15px;">انتخاب کنید:</p>
             </div>
             <div id="mode-selection">
-                <button data-mode="3x4">حافظه 3x4</button> <button data-mode="4x4">حافظه 4x4</button>
-                <button data-mode="4x5">حافظه 4x5</button> <button data-mode="5x6">حافظه 5x6</button>
+                <button data-mode="3x4">حافظه 3x4</button>
+                <button data-mode="4x4">حافظه 4x4</button>
+                <button data-mode="4x5">حافظه 4x5</button>
+                <button data-mode="5x6">حافظه 5x6</button>
                 <button data-mode="6x6">حافظه 6x6</button>
                 <hr style="margin: 10px 0; border-color: var(--modal-list-border-color);">
                 <button data-mode="pattern_challenge" class="challenge-button" style="padding: 12px 20px; font-size:1.1em;">شروع چالش الگو!</button>
             </div>`;
-        if (modalContent.length && overlay.length) {
-            modalContent.html(modalHTML); overlay.fadeIn(300);
-        } else {
-            console.error("Modal elements not found for initial modal!");
-        }
+        modalContent.html(modalHTML); 
+        overlay.fadeIn(300);
     }
 
     // Centralized event delegation for modal buttons
-    if (modalContent.length) {
-        // Detach any previous general click handlers on modalContent to prevent multiple bindings if this script runs multiple times (though ideally it shouldn't)
-        // More specific selectors for .off() might be better if other click events are on modalContent.
-        // For now, this targets buttons we add to #mode-selection and #close-modal-button.
-        modalContent.off('click', '#mode-selection button, #close-modal-button'); 
-        
-        modalContent.on('click', '#mode-selection button, #close-modal-button', function() { 
-            console.log("Modal button clicked:", $(this).data('mode') || "Close button");
-            const clickedButton = $(this);
-            if (clickedButton.is('#close-modal-button')) { 
-                if (overlay.length) overlay.fadeOut(300);
-                return;
+    modalContent.off('click', '#mode-selection button').on('click', '#mode-selection button', function() { 
+        const mode = $(this).data('mode');
+        if (mode === 'pattern_challenge') {
+            startPatternChallengeMode();
+        } else if (mode === 'main_menu') {
+            overlay.fadeOut(300, showInitialModal); // Fade out then show initial modal
+        } else { 
+            const modeParts = mode.split('x');
+            if (modeParts.length === 2 && !isNaN(parseInt(modeParts[0])) && !isNaN(parseInt(modeParts[1]))) { 
+                const r = parseInt(modeParts[0]);
+                const l = parseInt(modeParts[1]);
+                gameMode = mode; 
+                startMemoryGame(r, l);
+            } else {
+                console.error("Invalid memory game mode selected:", mode);
+                showInitialModal(); 
             }
-            const mode = clickedButton.data('mode');
-            if (mode === 'pattern_challenge') {
-                startPatternChallengeMode();
-            } else if (mode === 'main_menu') {
-                if (overlay.length) overlay.fadeOut(300, showInitialModal); else showInitialModal();
-            } else { 
-                const modeParts = mode.split('x');
-                if (modeParts.length === 2 && !isNaN(parseInt(modeParts[0])) && !isNaN(parseInt(modeParts[1]))) { 
-                    const r = parseInt(modeParts[0]);
-                    const l = parseInt(modeParts[1]);
-                    gameMode = mode; 
-                    startMemoryGame(r, l);
-                } else {
-                    console.error("Invalid memory game mode selected:", mode);
-                    showInitialModal(); 
-                }
-            }
-        });
-    } else {
-        console.error("#modal-content element not found for attaching event listeners!");
-    }
-    
+        }
+    });
+    modalContent.off('click', '#close-modal-button').on('click', '#close-modal-button', function() { 
+        overlay.fadeOut(300);
+    });
+
     // --- Initial Load ---
-    console.log("Document ready. Initializing game...");
     loadStatsAndAchievements();
     applyTheme(initialTheme); 
     showInitialModal(); 
 });
 // End of Part 2 of JavaScript
+                               

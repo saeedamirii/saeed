@@ -37,7 +37,7 @@ $(document).ready(function() {
     let currentPatternToGuess = [];
     let playerPatternGuess = [];
     let patternBoardLock = false; 
-    const PATTERN_HIGHLIGHT_DURATION = 1500; // کاهش یافت به ۱.۵ ثانیه
+    const PATTERN_HIGHLIGHT_DURATION = 1200; // کاهش یافت به ۱.۲ ثانیه
 
     // --- Music Toggle Logic ---
     if (musicToggleButton.length && backgroundMusic) {
@@ -63,10 +63,10 @@ $(document).ready(function() {
         'combo_3':      { id: 'combo_3',      name: 'ضربات متوالی',      description: 'در بازی حافظه، ۳ جفت را پشت سر هم و بدون اشتباه پیدا کنید.', icon: '⚡', unlocked: false, check: () => consecutiveMatches >= 3 },
         'loyal_player': { id: 'loyal_player', name: 'بازیکن وفادار',      description: 'در مجموع ۵ بازی حافظه (جفتی) کامل انجام دهید.',             icon: '💪', unlocked: false, check: () => totalGamesWon >= 5 },
         'collector_50': { id: 'collector_50', name: 'کلکسیونر کارت',     description: 'در بازی حافظه، مجموعاً ۵۰ جفت کارت صحیح پیدا کنید.', icon: '🃏', unlocked: false, check: () => totalPairsEverFound >= 50 },
-        'flawless_3x4': { id: 'flawless_3x4', name: 'بازی بی‌نقص (کوچک)', description: 'حالت حافظه 3x4 را با حداکثر ۸ حرکت کامل کنید.', icon: '💎', unlocked: false, check: (mode, mvs) => mode === '3x4' && mvs <= 8 }, // آسان‌تر شد
-        'golden_4x4':   { id: 'golden_4x4',   name: 'حرکات طلایی (متوسط)',description: 'حالت حافظه 4x4 را با حداکثر ۱۳ حرکت کامل کنید.', icon: '🌟', unlocked: false, check: (mode, mvs) => mode === '4x4' && mvs <= 13 }, // آسان‌تر شد
-        'strategist_5x6':{ id: 'strategist_5x6',name: 'استراتژیست برتر (بزرگ)', description: 'حالت حافظه 5x6 را با حداکثر ۲۳ حرکت کامل کنید.', icon: '🧭', unlocked: false, check: (mode, mvs) => mode === '5x6' && mvs <= 23 }, // آسان‌تر شد
-        'precision_6x6':{ id: 'precision_6x6', name: 'چالش دقت (حرفه‌ای)',description: 'حالت حافظه 6x6 را با حداکثر ۲۸ حرکت کامل کنید.', icon: '🎯', unlocked: false, check: (mode, mvs) => mode === '6x6' && mvs <= 28 }  // آسان‌تر شد
+        'flawless_3x4': { id: 'flawless_3x4', name: 'بازی بی‌نقص (کوچک)', description: 'حالت حافظه 3x4 را با حداکثر ۸ حرکت کامل کنید.', icon: '💎', unlocked: false, check: (mode, mvs) => mode === '3x4' && mvs <= 8 },
+        'golden_4x4':   { id: 'golden_4x4',   name: 'حرکات طلایی (متوسط)',description: 'حالت حافظه 4x4 را با حداکثر ۱۳ حرکت کامل کنید.', icon: '🌟', unlocked: false, check: (mode, mvs) => mode === '4x4' && mvs <= 13 },
+        'strategist_5x6':{ id: 'strategist_5x6',name: 'استراتژیست برتر (بزرگ)', description: 'حالت حافظه 5x6 را با حداکثر ۲۳ حرکت کامل کنید.', icon: '🧭', unlocked: false, check: (mode, mvs) => mode === '5x6' && mvs <= 23 },
+        'precision_6x6':{ id: 'precision_6x6', name: 'چالش دقت (حرفه‌ای)',description: 'حالت حافظه 6x6 را با حداکثر ۲۸ حرکت کامل کنید.', icon: '🎯', unlocked: false, check: (mode, mvs) => mode === '6x6' && mvs <= 28 }
     };
     let consecutiveMatches = 0; 
     let totalGamesWon = 0;      
@@ -125,7 +125,7 @@ $(document).ready(function() {
                     if (checkTime === 'gameEnd') { 
                         conditionMet = achievements[id].check(param1, param2); 
                     } else if (checkTime === 'pairFound') { 
-                        if (typeof achievements[id].check === 'function' && achievements[id].check.length === 0) { // Check for parameterless functions
+                        if (typeof achievements[id].check === 'function' && achievements[id].check.length === 0) {
                            conditionMet = achievements[id].check();
                         }
                     }
@@ -162,7 +162,6 @@ $(document).ready(function() {
     
     achievementsButton.on('click', displayAchievements);
 
-    // --- High Score Logic (For Original Memory Game) ---
     function getHighScores() {
         const scores = localStorage.getItem('memoryGameHighScores');
         return scores ? JSON.parse(scores) : {};
@@ -189,16 +188,13 @@ $(document).ready(function() {
         return `${displayM}:${displayS}`;
     }
 
-    // --- Theme Toggle Logic ---
     function applyTheme(theme) {
         if (theme === 'day') {
             bodyElement.addClass('day-mode');
-            themeToggleButton.text('☀️');
-            themeToggleButton.attr('title', 'تغییر به تم شب');
+            themeToggleButton.text('☀️').attr('title', 'تغییر به تم شب');
         } else {
             bodyElement.removeClass('day-mode');
-            themeToggleButton.text('🌙');
-            themeToggleButton.attr('title', 'تغییر به تم روز');
+            themeToggleButton.text('🌙').attr('title', 'تغییر به تم روز');
         }
     }
     const initialTheme = localStorage.getItem('memoryGameTheme') || 'night'; 
@@ -210,7 +206,6 @@ $(document).ready(function() {
         localStorage.setItem('memoryGameTheme', newTheme);
     });
 
-    // --- Shared Game Logic & UI ---
     function resetGameStats() { 
         moves = 0; matchesFound = 0; seconds = 0; minutes = 0; currentGameTimeInSeconds = 0;
         consecutiveMatches = 0; 
@@ -230,14 +225,12 @@ $(document).ready(function() {
         }, 1000);
     }
 
-    // --- Original Memory Game (Pair Matching) Logic ---
     function createMemoryBoard(rows, cols) {
         gameBoardElement.html(''); 
         gameBoardElement.attr('data-cols', cols);
         gameBoardElement.removeClass('pattern-board').addClass('memory-board'); 
         let itemIndex = 0;
         let cardElements = []; 
-
         for (let i = 0; i < rows; i++) {
             const tr = $('<tr></tr>');
             for (let j = 0; j < cols; j++) {
@@ -291,42 +284,30 @@ $(document).ready(function() {
     function handleMemoryCardClick() {
         const clickedCard = $(this); 
         if (lockBoard || clickedCard.hasClass('is-flipped') || clickedCard.hasClass('is-matched')) return;
-        
-        // Add 'is-flipped' for visual flip
         clickedCard.addClass('is-flipped');
-
         if (!firstCard) {
-            firstCard = clickedCard;
-            return;
+            firstCard = clickedCard; return;
         }
-        secondCard = clickedCard;
-        lockBoard = true;
+        secondCard = clickedCard; lockBoard = true;
         checkMemoryForMatch();
     }
 
     function checkMemoryForMatch() {
         const emojisMatch = firstCard.data('emoji') === secondCard.data('emoji');
         if (emojisMatch) {
-            incrementMemoryMoves(1); 
-            disableMemoryCards();
+            incrementMemoryMoves(1); disableMemoryCards();
         } else {
-            incrementMemoryMoves(2); 
-            unflipMemoryCards();
+            incrementMemoryMoves(2); unflipMemoryCards();
         }
     }
 
     function disableMemoryCards() {
-        firstCard.addClass('is-matched');
-        secondCard.addClass('is-matched');
-        matchesFound++;
-        consecutiveMatches++;
-        totalPairsEverFound++;
+        firstCard.addClass('is-matched'); secondCard.addClass('is-matched');
+        matchesFound++; consecutiveMatches++; totalPairsEverFound++;
         saveStatsAndAchievements(); 
         checkAllAchievements('pairFound');
         resetMemoryTurn();
-        if (matchesFound === totalPairs) {
-            endMemoryGame();
-        }
+        if (matchesFound === totalPairs) { endMemoryGame(); }
     }
 
     function unflipMemoryCards() {
@@ -339,15 +320,12 @@ $(document).ready(function() {
     }
 
     function resetMemoryTurn() {
-        [firstCard, secondCard] = [null, null];
-        lockBoard = false;
+        [firstCard, secondCard] = [null, null]; lockBoard = false;
     }
 
     function endMemoryGame() {
-        clearInterval(timerInterval);
-        totalGamesWon++; 
+        clearInterval(timerInterval); totalGamesWon++; 
         saveStatsAndAchievements(); 
-
         const timeTakenDisplayString = formatTime(currentGameTimeInSeconds);
         const newRecordMessage = updateHighScore(gameMode, moves, currentGameTimeInSeconds); 
         const highScores = getHighScores();
@@ -357,9 +335,7 @@ $(document).ready(function() {
             bestScoreDisplayString = `بهترین رکورد: ${String(bestScoreForMode.moves).replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[d])} حرکت در ${formatTime(bestScoreForMode.timeInSeconds)}`;
         }
         const movesDisplayString = String(moves).replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
-
         checkAllAchievements('gameEnd', gameMode, moves); 
-
         const modalHTML = `
             <h2 class="${newRecordMessage ? 'record-message' : ''}">${newRecordMessage ? newRecordMessage : "تبریک! شما برنده شدید!"}</h2>
             <p>شما حالت ${gameMode.replace('x', ' در ')} را با ${movesDisplayString} حرکت به پایان رساندید.</p>
@@ -373,33 +349,24 @@ $(document).ready(function() {
                 <hr style="margin: 10px 0; border-color: var(--modal-list-border-color);">
                 <button data-mode="pattern_challenge" class="challenge-button general-modal-button">چالش الگو</button>
             </div>`;
-        setTimeout(() => {
-            modalContent.html(modalHTML);
-            overlay.fadeIn(500);
-        }, 700);
+        setTimeout(() => { modalContent.html(modalHTML); overlay.fadeIn(500); }, 700);
     }
-
 // End of Part 1 of JavaScript
-
-    // Start of Part 2 of JavaScript
+// Start of Part 2 of JavaScript
 
     // --- Pattern Challenge Mode Logic ---
     function getPatternChallengeHighScore() {
         const score = localStorage.getItem('patternChallengeHighScore');
-        return score ? JSON.parse(score) : { maxStage: 0, maxScore: 0 }; // Default to 0 if no score saved
+        return score ? JSON.parse(score) : { maxStage: 0, maxScore: 0 };
     }
-
     function savePatternChallengeHighScore(stage, totalScore) {
         const currentHighScore = getPatternChallengeHighScore();
         let newRecord = false;
-        // A higher stage is always a new record.
-        // If stages are equal, a higher totalScore is a new record.
         if (stage > currentHighScore.maxStage) {
             newRecord = true;
         } else if (stage === currentHighScore.maxStage && totalScore > currentHighScore.maxScore) {
             newRecord = true;
         }
-        
         if (newRecord) {
              localStorage.setItem('patternChallengeHighScore', JSON.stringify({ maxStage: stage, maxScore: totalScore }));
         }
@@ -421,7 +388,6 @@ $(document).ready(function() {
         gameStatsHUD.hide();
         patternChallengeHUD.show();
         if(timerInterval) clearInterval(timerInterval); 
-
         currentPatternStage = 1;
         patternLives = 3;
         patternScore = 0; 
@@ -431,28 +397,28 @@ $(document).ready(function() {
 
     function determinePatternConfig(stage) {
         let rows, cols, numToHighlight;
-        // Slower grid progression and more gradual N increase
-        if (stage >= 1 && stage <= 5) { // 3x3 for 5 stages
+        // New progression: N stays constant for 3 stages then increments
+        if (stage >= 1 && stage <= 7) { // 3x3 for 7 stages
             rows = 3; cols = 3;
-            if (stage <= 2) numToHighlight = 3;      // Stages 1-2: 3 items
-            else if (stage <= 4) numToHighlight = 4; // Stages 3-4: 4 items
-            else numToHighlight = 5;                 // Stage 5: 5 items
-        } else if (stage >= 6 && stage <= 10) { // 4x4 for 5 stages
+            if (stage <= 3) numToHighlight = 3;      // Stages 1-3: N=3
+            else if (stage <= 6) numToHighlight = 4; // Stages 4-6: N=4
+            else numToHighlight = 5;                 // Stage 7: N=5
+        } else if (stage >= 8 && stage <= 14) { // 4x4 for 7 stages
             rows = 4; cols = 4;
-            if (stage <= 7) numToHighlight = 5;      // Stages 6-7: 5 items
-            else if (stage <= 9) numToHighlight = 6; // Stages 8-9: 6 items
-            else numToHighlight = 7;                 // Stage 10: 7 items
-        } else if (stage >= 11 && stage <= 15) { // 5x5 for 5 stages
+            if (stage <= 10) numToHighlight = 5;     // Stages 8-10: N=5
+            else if (stage <= 13) numToHighlight = 6;// Stages 11-13: N=6
+            else numToHighlight = 7;                // Stage 14: N=7
+        } else if (stage >= 15 && stage <= 21) { // 5x5 for 7 stages
             rows = 5; cols = 5;
-            if (stage <= 12) numToHighlight = 7;     // Stages 11-12: 7 items
-            else if (stage <= 14) numToHighlight = 8;// Stages 13-14: 8 items
-            else numToHighlight = 9;                // Stage 15: 9 items
-        } else { // Stages 16+ on 6x6
+            if (stage <= 17) numToHighlight = 7;     // Stages 15-17: N=7
+            else if (stage <= 20) numToHighlight = 8;// Stages 18-20: N=8
+            else numToHighlight = 9;                // Stage 21: N=9
+        } else { // Stages 22+ on 6x6
             rows = 6; cols = 6; 
-            // Start N at 9 for 6x6, and increase by 1 every two stages for 6x6
-            numToHighlight = 9 + Math.floor(Math.max(0, stage - 16) / 2); 
-            numToHighlight = Math.min(numToHighlight, Math.floor(rows * cols * 0.70)); // Cap at ~70% of cells
-            numToHighlight = Math.max(numToHighlight, 9); // Ensure at least 9 for 6x6 initial stages
+            // Starts at N=9, increases by 1 every 3 stages for 6x6
+            numToHighlight = 9 + Math.floor(Math.max(0, stage - 22) / 3); 
+            numToHighlight = Math.min(numToHighlight, Math.floor(rows * cols * 0.66)); // Cap at ~66% of cells (e.g., 24 for 6x6)
+            numToHighlight = Math.max(numToHighlight, 9); 
         }
         return { rows, cols, numToHighlight };
     }
@@ -494,7 +460,7 @@ $(document).ready(function() {
         cellElementsForAnimation.forEach((cell, index) => {
             setTimeout(() => {
                 cell.addClass('card-visible'); 
-            }, index * 40); 
+            }, index * 30); // Slightly faster dealing for pattern cells
         });
         
         setTimeout(() => { 
@@ -507,8 +473,8 @@ $(document).ready(function() {
                     $(`td[data-cell-id="${cellId}"] .card-inner`).removeClass('highlighted');
                 });
                 patternBoardLock = false; 
-            }, PATTERN_HIGHLIGHT_DURATION);
-        }, cellElementsForAnimation.length * 40 + 300); 
+            }, PATTERN_HIGHLIGHT_DURATION); // PATTERN_HIGHLIGHT_DURATION is 1200ms
+        }, cellElementsForAnimation.length * 30 + 250); // Adjusted buffer for dealing
 
         gameBoardElement.off('click', '.pattern-cell').on('click', '.pattern-cell', handlePatternCellClick);
     }
@@ -534,7 +500,7 @@ $(document).ready(function() {
                 setTimeout(() => {
                     currentPatternStage++;
                     setupNextPatternStage(); 
-                }, 600); 
+                }, 500); // Short delay before next stage starts
             }
         } else { 
             cellInner.addClass('selected-wrong');
@@ -559,7 +525,7 @@ $(document).ready(function() {
 
     function gameOverPatternChallenge() {
         patternBoardLock = true;
-        const completedStage = Math.max(0, currentPatternStage - (mistakesThisPatternAttempt < 3 && playerPatternGuess.length === currentPatternToGuess.length ? 0 : 1) );
+        const completedStage = Math.max(0, currentPatternStage - 1 ); 
         const newHighScore = savePatternChallengeHighScore(completedStage, patternScore); 
         const bestEver = getPatternChallengeHighScore();
 
@@ -622,12 +588,13 @@ $(document).ready(function() {
         overlay.fadeIn(300);
     }
 
+    // Centralized event delegation for modal buttons
     modalContent.off('click', '#mode-selection button').on('click', '#mode-selection button', function() { 
         const mode = $(this).data('mode');
         if (mode === 'pattern_challenge') {
             startPatternChallengeMode();
         } else if (mode === 'main_menu') {
-            showInitialModal(); 
+            overlay.fadeOut(300, showInitialModal); // Fade out then show initial modal
         } else { 
             const modeParts = mode.split('x');
             if (modeParts.length === 2 && !isNaN(parseInt(modeParts[0])) && !isNaN(parseInt(modeParts[1]))) { 
@@ -651,5 +618,5 @@ $(document).ready(function() {
     showInitialModal(); 
 });
 // End of Part 2 of JavaScript
-
-            
+                
+                  

@@ -39,14 +39,12 @@
     --achievement-unlocked-border: var(--modal-record-message-color);
     --toast-bg-color: var(--modal-record-message-color);
     
-    /* General card/cell settings */
-    --cols: 6; /* Default for memory game responsive sizing */
+    --cols: 6; 
     --base-cell-size-desktop: 75px;
     --base-cell-spacing-desktop: 8px;
 
-    /* Pattern Challenge specific cell settings */
-    --pattern-cell-size-desktop: 55px; /* کوچکتر شد */
-    --pattern-cell-spacing-desktop: 5px; /* فاصله کمتر */
+    --pattern-cell-size-desktop: 45px; /* کوچکتر شد */
+    --pattern-cell-spacing-desktop: 8px; /* فاصله بیشتر شد */
     --pattern-cell-bg: rgba(255, 255, 255, 0.08); 
     --pattern-cell-highlight-bg: #00d9ff; 
     --pattern-cell-highlight-outline: rgba(0,0,0,0.4); 
@@ -93,32 +91,21 @@ body.day-mode {
     --achievement-item-bg: rgba(0,0,0,0.03);
     --pattern-cell-bg: rgba(0, 0, 0, 0.05); 
     --pattern-cell-highlight-bg: #4682B4;
-    --pattern-cell-highlight-outline: rgba(255,255,255,0.6);
+    --pattern-cell-highlight-outline: rgba(255,255,255,0.7);
     --pattern-cell-correct-bg: #20c997;
     --pattern-cell-wrong-bg: #dc3545; 
     --hud-text-color: #1c1c2e;
 }
 
+/* ... (بقیه کد CSS شامل *, html, body, انیمیشن پس‌زمینه، هدر، دکمه‌ها، لوگو، آمار، HUD، مودال‌ها، مدال‌ها، Toast، فوتر و بخش ریسپانسیو مثل قبل) ... */
+/* ... فقط بخش‌های اصلاح شده یا مهم در ادامه آمده‌اند ... */
+
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Vazirmatn', Arial, sans-serif; transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease; }
 html, body { width: 100%; height: 100%; overflow-x: hidden; }
-
-body {
-    background-color: var(--bg-color); 
-    color: var(--text-color);
-    display: flex; flex-direction: column; align-items: center;
-    padding-top: 20px; min-height: 100vh;
-    background: linear-gradient(-45deg, #0d0f2b, #231e67, #3d0f91, #0abfbc, #050a19);
-    background-size: 400% 400%;
-    animation: gradientBG 25s ease infinite alternate;
-}
-body.day-mode {
-    background: linear-gradient(-45deg, #e0e6f0, #cad5e8, #b0b8d0, #d0d8e0);
-    background-size: 400% 400%;
-    animation: gradientBGDay 30s ease infinite alternate;
-}
+body { background-color: var(--bg-color); color: var(--text-color); display: flex; flex-direction: column; align-items: center; padding-top: 20px; min-height: 100vh; background: linear-gradient(-45deg, #0d0f2b, #231e67, #3d0f91, #0abfbc, #050a19); background-size: 400% 400%; animation: gradientBG 25s ease infinite alternate; }
+body.day-mode { background: linear-gradient(-45deg, #e0e6f0, #cad5e8, #b0b8d0, #d0d8e0); background-size: 400% 400%; animation: gradientBGDay 30s ease infinite alternate; }
 @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 @keyframes gradientBGDay { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-
 #game-header { width: 90%; max-width: 700px; background-color: var(--header-bg); padding: 10px 20px; border-radius: 12px; box-shadow: 0 4px 20px var(--shadow-color); display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; position: relative; -webkit-backdrop-filter: blur(5px); backdrop-filter: blur(5px); }
 #header-buttons-left { display: flex; align-items: center; gap: 10px; order: -1; margin-right: 15px; }
 #theme-toggle-button, #achievements-button, #music-toggle-button { background: none; border: 1px solid var(--header-icon-button-border); color: var(--header-icon-button-color); font-size: 1.5em; border-radius: 50%; cursor: pointer; padding: 5px 7px; line-height: 1; min-width: 40px; min-height: 40px; display: flex; justify-content: center; align-items: center; transition: transform 0.2s ease, color 0.3s ease, border-color 0.3s ease; }
@@ -128,56 +115,21 @@ body.day-mode {
 #logo { font-size: 1.8em; font-weight: 700; color: var(--logo-color); }
 #game-stats { display: flex; gap: 20px; font-size: 1.1em; }
 #moves-display, #time-display { background-color: var(--stats-bg); padding: 8px 15px; border-radius: 8px; box-shadow: inset 0 2px 4px var(--stats-shadow-inset-color); color: var(--text-color); }
-
 #pattern-challenge-hud { width: 90%; max-width: 700px; margin: 0 auto 15px auto; padding: 10px 15px; background-color: var(--header-bg); -webkit-backdrop-filter: blur(5px); backdrop-filter: blur(5px); border-radius: 8px; box-shadow: 0 2px 10px var(--shadow-color); display: flex; justify-content: space-between; align-items: center; color: var(--hud-text-color); font-size: 1.1em; }
-#hud-left-stats div { margin-bottom: 3px; }
-#hud-left-stats div:last-child { margin-bottom: 0; }
+#hud-left-stats div { margin-bottom: 3px; } #hud-left-stats div:last-child { margin-bottom: 0; }
 #hud-lives { display: flex; gap: 5px; font-size: 1.5em; }
-.hud-heart.filled { color: #ff4757; } 
-body.day-mode .hud-heart.filled { color: #e84393; } 
+.hud-heart.filled { color: #ff4757; } body.day-mode .hud-heart.filled { color: #e84393; } 
 .hud-heart.empty { color: var(--modal-secondary-text-color); opacity: 0.5; }
-
 main { display: flex; justify-content: center; align-items: center; flex-grow: 1; padding: 0 10px; }
-#game-board { border-collapse: separate; /* default, but ensure */ } 
+#game-board { border-collapse: separate; } 
 
-/* Default td for memory game */
-.memory-board td { 
-    width: var(--base-cell-size-desktop); 
-    height: var(--base-cell-size-desktop); 
-    perspective: 1000px; 
-    background-color: transparent;
-}
-.memory-board { /* Table specific for memory game */
-    border-spacing: var(--base-cell-spacing-desktop);
-}
+.memory-board td { width: var(--base-cell-size-desktop); height: var(--base-cell-size-desktop); perspective: 1000px; background-color: transparent; }
+.memory-board { border-spacing: var(--base-cell-spacing-desktop); }
+.pattern-board td { width: var(--pattern-cell-size-desktop); height: var(--pattern-cell-size-desktop); background-color: transparent; } /* perspective: 1000px; اگر انیمیشن 3D نیاز بود */
+.pattern-board { border-spacing: var(--pattern-cell-spacing-desktop); }
 
-
-/* td for pattern challenge game - smaller */
-.pattern-board td {
-    width: var(--pattern-cell-size-desktop);
-    height: var(--pattern-cell-size-desktop);
-    perspective: 1000px; /* Might not be needed if no 3D flip */
-    background-color: transparent;
-}
-.pattern-board { /* Table specific for pattern game */
-    border-spacing: var(--pattern-cell-spacing-desktop);
-}
-
-
-.card-inner {
-    width: 100%; height: 100%;
-    text-align: center;
-    cursor: pointer; border-radius: 10px;
-    opacity: 0; 
-    transform: scale(0.7) translateY(30px); 
-    transition: opacity 0.4s ease-out, transform 0.4s ease-out, background-color 0.2s ease, box-shadow 0.3s ease;
-    box-shadow: 0 6px 12px var(--card-shadow-color); 
-}
-.card-inner.card-visible { 
-    opacity: 1;
-    transform: scale(1) translateY(0);
-}
-
+.card-inner { width: 100%; height: 100%; text-align: center; cursor: pointer; border-radius: 10px; opacity: 0; transform: scale(0.7) translateY(30px); transition: opacity 0.4s ease-out, transform 0.4s ease-out, background-color 0.2s ease, box-shadow 0.3s ease; box-shadow: 0 6px 12px var(--card-shadow-color); }
+.card-inner.card-visible { opacity: 1; transform: scale(1) translateY(0); }
 .memory-card .card-inner { position: relative; transform-style: preserve-3d; }
 .memory-card .card-inner.is-flipped { transform: rotateY(180deg) scale(1) translateY(0) !important; transition: transform 0.7s; }
 .memory-card .card-inner.is-matched { opacity: 0.4 !important; cursor: default; box-shadow: 0 2px 5px var(--card-shadow-color); }
@@ -185,19 +137,8 @@ main { display: flex; justify-content: center; align-items: center; flex-grow: 1
 .card-front { background: linear-gradient(135deg, var(--card-front-gradient-start), var(--card-front-gradient-end)); }
 .card-back { background-color: var(--card-back-bg); transform: rotateY(180deg); }
 .card-back p { font-size: 2.8em; color: var(--card-back-emoji-color); margin: 0; }
-
-.pattern-cell .card-inner { 
-    background-color: var(--pattern-cell-bg); 
-    display: flex; 
-    justify-content: center;
-    align-items: center;
-}
-.pattern-cell .card-inner.highlighted { 
-    background-color: var(--pattern-cell-highlight-bg) !important; 
-    transform: scale(1.05) translateY(0) !important; 
-    outline: 1px solid var(--pattern-cell-highlight-outline); 
-    box-shadow: 0 0 10px var(--pattern-cell-highlight-bg); 
-}
+.pattern-cell .card-inner { background-color: var(--pattern-cell-bg); display: flex; justify-content: center; align-items: center; }
+.pattern-cell .card-inner.highlighted { background-color: var(--pattern-cell-highlight-bg) !important; transform: scale(1.05) translateY(0) !important; outline: 1px solid var(--pattern-cell-highlight-outline); box-shadow: 0 0 8px var(--pattern-cell-highlight-bg); }
 .pattern-cell .card-inner.selected-correct { background-color: var(--pattern-cell-correct-bg) !important; }
 .pattern-cell .card-inner.selected-wrong { background-color: var(--pattern-cell-wrong-bg) !important; animation: shakeError 0.4s ease-in-out; }
 @keyframes shakeError { 0%, 100% { transform: translateX(0) scale(1) translateY(0); } 25% { transform: translateX(-5px) scale(1) translateY(0); } 75% { transform: translateX(5px) scale(1) translateY(0); } }
@@ -250,18 +191,16 @@ footer { width: 100%; text-align: center; padding: 20px 0; margin-top: auto; fon
     #game-stats span, #pattern-challenge-hud > div { padding: 6px 10px; }
     #hud-lives {font-size: 1.3em;}
     .memory-board td { width: 65px; height: 65px; }
-    .pattern-board td { width: 50px; height: 50px; } /* کوچکتر برای مود چالشی در تبلت */
-    .card-back p { font-size: 2.2em; } /* برای کارت‌های حافظه */
-    .pattern-cell .card-inner { font-size: 1.8em; } /* اگر محتوایی داشت */
-    #modal-content { padding: 20px; }
-    #modal-content h2 { font-size: 1.8em; }
-    #modal-content p { font-size: 1em; }
+    .pattern-board td { width: 45px; height: 45px; } /* کوچکتر برای مود چالشی در تبلت */
+    .pattern-board { border-spacing: 6px; }
+
+    .card-back p { font-size: 2.2em; } 
+    #modal-content { padding: 20px; } #modal-content h2 { font-size: 1.8em; } #modal-content p { font-size: 1em; }
     #modal-content button { padding: 10px 20px; font-size: 0.9em;}
     #header-buttons-left { margin-right: 10px; gap: 8px; }
     #theme-toggle-button, #achievements-button, #music-toggle-button { font-size: 1.3em; padding: 4px 6px; min-width: 35px; min-height: 35px;}
     .achievement-item .icon { font-size: 2em; } 
-    html[dir="rtl"] .achievement-item .icon { margin-left: 10px; }
-    html[dir="ltr"] .achievement-item .icon { margin-right: 10px; }
+    html[dir="rtl"] .achievement-item .icon { margin-left: 10px; } html[dir="ltr"] .achievement-item .icon { margin-right: 10px; }
     .achievement-item .details h4 { font-size: 1.1em; }
 }
 @media (max-width: 480px) {
@@ -272,25 +211,26 @@ footer { width: 100%; text-align: center; padding: 20px 0; margin-top: auto; fon
     #game-stats, #pattern-challenge-hud { width: 100%; justify-content: space-around; margin-top: 5px; }
     #pattern-challenge-hud { padding: 8px 10px; font-size: 0.85em; }
     #hud-lives {font-size: 1.2em;}
+    
     .memory-board { border-spacing: 5px; }
     .memory-board td { width: calc((100vw - 30px - (5px * (var(--cols, 6) - 1))) / var(--cols, 6)); height: calc((100vw - 30px - (5px * (var(--cols, 6) - 1))) / var(--cols, 6)); }
-    .pattern-board { border-spacing: 4px; } /* فاصله کمتر برای خانه‌های کوچکتر */
-    .pattern-board td { width: calc((100vw - 30px - (4px * (var(--cols, 6) - 1))) / var(--cols, 6)); height: calc((100vw - 30px - (4px * (var(--cols, 6) - 1))) / var(--cols, 6)); }
+    
+    .pattern-board { border-spacing: 6px; } /* فاصله بیشتر برای مود چالشی در موبایل */
+    .pattern-board td { width: calc((100vw - 40px - (6px * (var(--cols, 6) - 1))) / var(--cols, 6)); height: calc((100vw - 40px - (6px * (var(--cols, 6) - 1))) / var(--cols, 6)); }
+
 
     .card-back p { font-size: 1.6em; }
-    #modal-content h2 { font-size: 1.5em; }
-    #modal-content p { font-size: 0.9em; }
+    #modal-content h2 { font-size: 1.5em; } #modal-content p { font-size: 0.9em; }
     #modal-content button { padding: 8px 15px; width: auto; min-width: 80px; font-size: 0.8em;}
     .achievement-item { flex-direction: row; align-items: center; text-align: right; } 
     .achievement-item .icon { float: none; margin-bottom: 0; } 
-    html[dir="rtl"] .achievement-item .icon { margin-right: 10px; margin-left:0; }
-    html[dir="ltr"] .achievement-item .icon { margin-left: 0; margin-right:10px; }
+    html[dir="rtl"] .achievement-item .icon { margin-right: 10px; margin-left:0; } html[dir="ltr"] .achievement-item .icon { margin-left: 0; margin-right:10px; }
 }
 @media (max-width: 380px) { 
     .memory-board td { width: calc((100vw - 20px - (4px * (var(--cols, 6) - 1))) / var(--cols, 6)); height: calc((100vw - 20px - (4px * (var(--cols, 6) - 1))) / var(--cols, 6));}
     .memory-board {border-spacing: 4px; }
-    .pattern-board td { width: calc((100vw - 20px - (3px * (var(--cols, 6) - 1))) / var(--cols, 6)); height: calc((100vw - 20px - (3px * (var(--cols, 6) - 1))) / var(--cols, 6));}
-    .pattern-board {border-spacing: 3px; }
+    .pattern-board td { width: calc((100vw - 20px - (5px * (var(--cols, 6) - 1))) / var(--cols, 6)); height: calc((100vw - 20px - (5px * (var(--cols, 6) - 1))) / var(--cols, 6));} /* فاصله بیشتر برای مود چالشی */
+    .pattern-board {border-spacing: 5px; }
 
     .card-back p {font-size: 1.4em;}
     #header-buttons-left { gap: 5px; }
@@ -301,5 +241,4 @@ footer { width: 100%; text-align: center; padding: 20px 0; margin-top: auto; fon
 #game-board[data-cols="4"] { --cols: 4; }
 #game-board[data-cols="5"] { --cols: 5; }
 #game-board[data-cols="6"] { --cols: 6; }
-
-    
+                                       

@@ -97,10 +97,6 @@ body.day-mode {
     --hud-text-color: #1c1c2e;
 }
 
-/* ... (بقیه کد CSS که شامل استایل‌های کامل برای همه عناصر و بخش ریسپانسیو است، دقیقاً مشابه پاسخ شماره ۵۴ خواهد بود. برای جلوگیری از طولانی شدن بیش از حد، فقط بخش متغیرها و چند مورد کلیدی آورده شده است. لطفاً مطمئن شوید تمام CSS از پاسخ ۵۴ را دارید و فقط متغیرهای بالا را در صورت نیاز به‌روز کنید یا با آن تطبیق دهید.) ... */
-/* Ensure all previous CSS from response #54 (the one with full CSS) is here */
-/* Key parts from response #54 are below for reference, integrate them fully */
-
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Vazirmatn', Arial, sans-serif; transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease; }
 html, body { width: 100%; height: 100%; overflow-x: hidden; }
 body { background-color: var(--bg-color); color: var(--text-color); display: flex; flex-direction: column; align-items: center; padding-top: 20px; min-height: 100vh; background: linear-gradient(-45deg, #0d0f2b, #231e67, #3d0f91, #0abfbc, #050a19); background-size: 400% 400%; animation: gradientBG 25s ease infinite alternate; }
@@ -114,9 +110,9 @@ body.day-mode { background: linear-gradient(-45deg, #e0e6f0, #cad5e8, #b0b8d0, #
 @keyframes pulseAnimation { 0% { transform: scale(1); } 50% { transform: scale(1.12); } 100% { transform: scale(1); } }
 #music-toggle-button.pulsating-music { animation: pulseAnimation 1.3s infinite ease-in-out; border-color: var(--header-icon-button-hover-color); }
 #logo { font-size: 1.8em; font-weight: 700; color: var(--logo-color); }
-#game-stats { display: flex; gap: 20px; font-size: 1.1em; } /* Default state controlled by JS */
+#game-stats { display: flex; gap: 20px; font-size: 1.1em; } 
 #moves-display, #time-display { background-color: var(--stats-bg); padding: 8px 15px; border-radius: 8px; box-shadow: inset 0 2px 4px var(--stats-shadow-inset-color); color: var(--text-color); }
-#pattern-challenge-hud { width: 90%; max-width: 700px; margin: 0 auto 15px auto; padding: 10px 15px; background-color: var(--header-bg); -webkit-backdrop-filter: blur(5px); backdrop-filter: blur(5px); border-radius: 8px; box-shadow: 0 2px 10px var(--shadow-color); display: flex; justify-content: space-between; align-items: center; color: var(--hud-text-color); font-size: 1.1em; } /* Default state controlled by JS */
+#pattern-challenge-hud { width: 90%; max-width: 700px; margin: 0 auto 15px auto; padding: 10px 15px; background-color: var(--header-bg); -webkit-backdrop-filter: blur(5px); backdrop-filter: blur(5px); border-radius: 8px; box-shadow: 0 2px 10px var(--shadow-color); display: flex; justify-content: space-between; align-items: center; color: var(--hud-text-color); font-size: 1.1em; } 
 #hud-left-stats div { margin-bottom: 3px; } #hud-left-stats div:last-child { margin-bottom: 0; }
 #hud-lives { display: flex; gap: 5px; font-size: 1.5em; }
 .hud-heart.filled { color: #ff4757; } body.day-mode .hud-heart.filled { color: #e84393; } 
@@ -179,7 +175,7 @@ html[dir="ltr"] .achievement-item.unlocked { border-left-color: var(--achievemen
 footer { width: 100%; text-align: center; padding: 20px 0; margin-top: auto; font-size: 0.9em; color: var(--modal-secondary-text-color); }
 .credit-text { opacity: 0.75; }
 
-@media (max-width: 768px) { /* ... (بخش ریسپانسیو مثل قبل، فقط اندازه td های مود چالشی را چک کنید) ... */
+@media (max-width: 768px) {
     #logo { font-size: 1.5em; }
     #game-stats, #pattern-challenge-hud { font-size: 0.9em; gap: 10px; }
     #game-stats span, #pattern-challenge-hud > div { padding: 6px 10px; }
@@ -230,4 +226,4 @@ footer { width: 100%; text-align: center; padding: 20px 0; margin-top: auto; fon
 #game-board[data-cols="5"] { --cols: 5; }
 #game-board[data-cols="6"] { --cols: 6; }
 
-                      
+                                                                                                                         

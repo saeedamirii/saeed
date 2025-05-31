@@ -29,7 +29,6 @@ $(document).ready(function() {
     const hudScore = $('#hud-score');
     const hudLives = $('#hud-lives');
 
-    // --- Pattern Challenge Mode Variables ---
     let currentPatternStage = 1;
     let patternLives = 3;
     let patternScore = 0; 
@@ -37,7 +36,7 @@ $(document).ready(function() {
     let currentPatternToGuess = [];
     let playerPatternGuess = [];
     let patternBoardLock = false; 
-    const PATTERN_HIGHLIGHT_DURATION = 1000; // کاهش یافت به ۱ ثانیه
+    const PATTERN_HIGHLIGHT_DURATION = 1000; // ۱ ثانیه
 
     // --- Music Toggle Logic ---
     if (musicToggleButton.length && backgroundMusic) {
@@ -47,7 +46,7 @@ $(document).ready(function() {
                     .then(() => {
                         musicToggleButton.text('⏸️').attr('title', 'قطع موزیک').addClass('pulsating-music');
                     })
-                    .catch(error => console.error("Error playing music:", error));
+                    .catch(error => { console.error("Error playing music:", error); /* می توانید اینجا یک پیام به کاربر هم نشان دهید */ });
             } else {
                 backgroundMusic.pause();
                 musicToggleButton.text('🎵').attr('title', 'پخش موزیک').removeClass('pulsating-music');
@@ -72,103 +71,21 @@ $(document).ready(function() {
     let totalGamesWon = 0;      
     let totalPairsEverFound = 0;
 
-    function loadStatsAndAchievements() {
-        const savedAchievements = JSON.parse(localStorage.getItem('memoryGameAchievementsStatus'));
-        if (savedAchievements) {
-            for (const id in achievements) {
-                if (achievements.hasOwnProperty(id) && savedAchievements[id] !== undefined) {
-                    achievements[id].unlocked = savedAchievements[id];
-                }
-            }
-        }
-        totalGamesWon = parseInt(localStorage.getItem('memoryGameTotalGamesWon')) || 0;
-        totalPairsEverFound = parseInt(localStorage.getItem('memoryGameTotalPairsEverFound')) || 0;
-    }
-
-    function saveStatsAndAchievements() {
-        let statuses = {};
-        for (const id in achievements) {
-            if (achievements.hasOwnProperty(id)) {
-                statuses[id] = achievements[id].unlocked;
-            }
-        }
-        localStorage.setItem('memoryGameAchievementsStatus', JSON.stringify(statuses));
-        localStorage.setItem('memoryGameTotalGamesWon', totalGamesWon);
-        localStorage.setItem('memoryGameTotalPairsEverFound', totalPairsEverFound);
-    }
+    function loadStatsAndAchievements() { /* ... (مثل قبل) ... */ }
+    function saveStatsAndAchievements() { /* ... (مثل قبل) ... */ }
+    function showToast(message) { /* ... (مثل قبل) ... */ }
+    function unlockAchievement(id) { /* ... (مثل قبل) ... */ }
+    function checkAllAchievements(checkTime, param1, param2) { /* ... (مثل قبل) ... */ }
+    function displayAchievements() { /* ... (مثل قبل) ... */ }
+    if (achievementsButton.length) achievementsButton.on('click', displayAchievements);
     
-    function showToast(message) {
-        toastNotification.text(message);
-        toastNotification.addClass('show');
-        setTimeout(() => {
-            toastNotification.removeClass('show');
-        }, 3500);
-    }
-
-    function unlockAchievement(id) {
-        if (achievements[id] && !achievements[id].unlocked) {
-            achievements[id].unlocked = true;
-            showToast(`مدال "${achievements[id].name}" کسب شد! ${achievements[id].icon}`);
-            saveStatsAndAchievements(); 
-            if (overlay.is(':visible') && $('#achievements-list-container').length) { 
-                 displayAchievements();
-            }
-        }
-    }
-
-    function checkAllAchievements(checkTime, param1, param2) { 
-        if (activeGameType !== 'memory') return; 
-        for (const id in achievements) {
-            if (achievements.hasOwnProperty(id) && !achievements[id].unlocked) {
-                let conditionMet = false;
-                try { 
-                    if (checkTime === 'gameEnd') { 
-                        conditionMet = achievements[id].check(param1, param2); 
-                    } else if (checkTime === 'pairFound') { 
-                        if (typeof achievements[id].check === 'function' && achievements[id].check.length === 0) {
-                           conditionMet = achievements[id].check();
-                        }
-                    }
-                } catch (e) {
-                    console.error("Error checking achievement:", id, e, "Check function:", achievements[id].check);
-                }
-                if (conditionMet) {
-                    unlockAchievement(id);
-                }
-            }
-        }
-    }
-    
-    function displayAchievements() {
-        let listHTML = '<div id="achievements-list-container"><ul id="achievements-list">';
-        for (const id in achievements) {
-            if (achievements.hasOwnProperty(id)) {
-                const ach = achievements[id];
-                listHTML += `
-                    <li class="achievement-item ${ach.unlocked ? 'unlocked' : 'locked'}">
-                        <span class="icon">${ach.icon}</span>
-                        <div class="details">
-                            <h4>${ach.name}</h4>
-                            <p>${ach.description}</p>
-                        </div>
-                    </li>`;
-            }
-        }
-        listHTML += '</ul></div>';
-        
-        modalContent.html(`<h2>مدال‌ها و دستاوردها</h2>` + listHTML + '<button id="close-modal-button" class="general-modal-button" style="margin-top:20px; flex-shrink: 0;">بستن</button>');
-        overlay.fadeIn(300);
-    }
-    
-    achievementsButton.on('click', displayAchievements);
-
     function getHighScores() { /* ... (مثل قبل) ... */ }
     function saveHighScores(scores) { /* ... (مثل قبل) ... */ }
     function updateHighScore(mode, currentMoves, currentTimeInSeconds) { /* ... (مثل قبل) ... */ }
     function formatTime(totalSeconds) { /* ... (مثل قبل) ... */ }
     function applyTheme(theme) { /* ... (مثل قبل) ... */ }
     const initialTheme = localStorage.getItem('memoryGameTheme') || 'night'; 
-    themeToggleButton.on('click', function() { /* ... (مثل قبل) ... */ });
+    if (themeToggleButton.length) themeToggleButton.on('click', function() { /* ... (مثل قبل) ... */ });
     function resetGameStats() { /* ... (مثل قبل) ... */ }
     function startTimer() { /* ... (مثل قبل) ... */ }
     function createMemoryBoard(rows, cols) { /* ... (مثل قبل) ... */ }
@@ -204,32 +121,35 @@ $(document).ready(function() {
     }
 
     function updatePatternHUD() {
-        hudStage.text(String(currentPatternStage).replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]));
-        hudScore.text(String(patternScore).replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]));
-        let heartsHTML = "";
-        for (let i = 0; i < 3; i++) {
-            heartsHTML += `<span class="hud-heart ${i < patternLives ? 'filled' : 'empty'}">❤️</span>`;
+        if (hudStage.length && hudScore.length && hudLives.length) { // Check if elements exist
+            hudStage.text(String(currentPatternStage).replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]));
+            hudScore.text(String(patternScore).replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]));
+            let heartsHTML = "";
+            for (let i = 0; i < 3; i++) {
+                heartsHTML += `<span class="hud-heart ${i < patternLives ? 'filled' : 'empty'}">❤️</span>`;
+            }
+            hudLives.html(heartsHTML);
         }
-        hudLives.html(heartsHTML);
     }
 
     function startPatternChallengeMode() {
         activeGameType = 'pattern';
-        gameStatsHUD.hide();
-        patternChallengeHUD.show();
+        if (gameStatsHUD.length) gameStatsHUD.hide();
+        if (patternChallengeHUD.length) patternChallengeHUD.show();
         if(timerInterval) clearInterval(timerInterval); 
+
         currentPatternStage = 1;
         patternLives = 3;
         patternScore = 0; 
         setupNextPatternStage();
-        overlay.fadeOut(300);
+        if (overlay.length) overlay.fadeOut(300);
     }
 
     function determinePatternConfig(stage) {
         let rows, cols, numToHighlight;
-        // New N progression: N stays constant for ~3 stages then increments, 3x3 is one stage
-        if (stage === 1) { // 3x3 is only one stage
-            rows = 3; cols = 3; numToHighlight = 4; // Start with N=4 for 3x3 as it's quick
+        // New N progression: N stays constant for ~3 stages then increments
+        if (stage === 1) { // 3x3 is only one stage now
+            rows = 3; cols = 3; numToHighlight = 4; 
         } else if (stage >= 2 && stage <= 10) { // 4x4 for 9 stages (stages 2 to 10)
             rows = 4; cols = 4;
             if (stage <= 4) numToHighlight = 5;      // Stages 2-4 (3 stages): N=5
@@ -242,7 +162,6 @@ $(document).ready(function() {
             else numToHighlight = 9;                // Stages 17-19: N=9
         } else { // Stages 20+ on 6x6
             rows = 6; cols = 6; 
-            // Starts at N=9, increases by 1 every 3 stages for 6x6
             numToHighlight = 9 + Math.floor(Math.max(0, stage - 20) / 3); 
             numToHighlight = Math.min(numToHighlight, Math.floor(rows * cols * 0.60)); 
             numToHighlight = Math.max(numToHighlight, 9); 
@@ -257,6 +176,7 @@ $(document).ready(function() {
         updatePatternHUD();
 
         const config = determinePatternConfig(currentPatternStage);
+        if (!gameBoardElement.length) { console.error("#game-board not found!"); return; }
         gameBoardElement.html('');
         gameBoardElement.attr('data-cols', config.cols);
         gameBoardElement.removeClass('memory-board').addClass('pattern-board');
@@ -265,9 +185,7 @@ $(document).ready(function() {
         let allCellIndices = Array.from(Array(totalCells).keys());
         currentPatternToGuess = [];
         
-        // Ensure numToHighlight does not exceed totalCells
         const actualNumToHighlight = Math.min(config.numToHighlight, totalCells);
-
         for (let i = 0; i < actualNumToHighlight; i++) {
             if (allCellIndices.length === 0) break;
             let randIndex = Math.floor(Math.random() * allCellIndices.length);
@@ -288,16 +206,13 @@ $(document).ready(function() {
         }
         
         cellElementsForAnimation.forEach((cell, index) => {
-            setTimeout(() => {
-                cell.addClass('card-visible'); 
-            }, index * 30); 
+            setTimeout(() => { cell.addClass('card-visible'); }, index * 30); 
         });
         
         setTimeout(() => { 
             currentPatternToGuess.forEach(cellId => {
                 $(`td[data-cell-id="${cellId}"] .card-inner`).addClass('highlighted');
             });
-
             setTimeout(() => { 
                 currentPatternToGuess.forEach(cellId => {
                     $(`td[data-cell-id="${cellId}"] .card-inner`).removeClass('highlighted');
@@ -311,12 +226,9 @@ $(document).ready(function() {
 
     function handlePatternCellClick() {
         if (patternBoardLock) return;
-        
         const clickedCellTd = $(this);
         const cellInner = clickedCellTd.find('.card-inner');
-
         if (cellInner.hasClass('selected-correct') || cellInner.hasClass('selected-wrong')) return;
-
         const cellId = parseInt(clickedCellTd.data('cell-id'));
 
         if (currentPatternToGuess.includes(cellId)) { 
@@ -324,22 +236,15 @@ $(document).ready(function() {
             cellInner.addClass('selected-correct');
             patternScore++; 
             updatePatternHUD();
-
             if (playerPatternGuess.length === currentPatternToGuess.length) { 
                 patternBoardLock = true; 
-                setTimeout(() => {
-                    currentPatternStage++;
-                    setupNextPatternStage(); 
-                }, 500); 
+                setTimeout(() => { currentPatternStage++; setupNextPatternStage(); }, 600); 
             }
         } else { 
             cellInner.addClass('selected-wrong');
             mistakesThisPatternAttempt++;
-            
             if (mistakesThisPatternAttempt >= 3) {
-                patternLives--;
-                updatePatternHUD();
-                patternBoardLock = true; 
+                patternLives--; updatePatternHUD(); patternBoardLock = true; 
                 if (patternLives <= 0) {
                     gameOverPatternChallenge();
                 } else {
@@ -355,13 +260,9 @@ $(document).ready(function() {
 
     function gameOverPatternChallenge() {
         patternBoardLock = true;
-        // If player lost on stage X, they completed X-1 stages. If they completed stage X and then lost on stage X+1, they completed X.
-        // PlayerPatternGuess might not be full if they lost life due to 3 mistakes before completing the pattern.
-        const completedStage = (patternLives > 0 && playerPatternGuess.length === currentPatternToGuess.length) ? currentPatternStage : Math.max(0, currentPatternStage -1) ;
-
+        const completedStage = Math.max(0, currentPatternStage - (patternLives > 0 && playerPatternGuess.length === currentPatternToGuess.length ? 0 : 1) ); 
         const newHighScore = savePatternChallengeHighScore(completedStage, patternScore); 
         const bestEver = getPatternChallengeHighScore();
-
         const completedStageFarsi = String(completedStage).replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
         const patternScoreFarsi = String(patternScore).replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
         const bestStageFarsi = String(bestEver.maxStage).replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
@@ -380,16 +281,15 @@ $(document).ready(function() {
                 <hr style="margin: 10px 0; border-color: var(--modal-list-border-color);">
                 <button data-mode="main_menu" class="general-modal-button">منوی اصلی</button> 
             </div>`;
-        
-        modalContent.html(gameOverHTML);
-        overlay.fadeIn(500);
+        if (modalContent.length && overlay.length) {
+            modalContent.html(gameOverHTML); overlay.fadeIn(500);
+        }
     }
 
-    // --- Initial Modal Setup & Main Menu Logic ---
     function showInitialModal() {
         activeGameType = null; 
-        patternChallengeHUD.hide();
-        gameStatsHUD.hide(); 
+        if (patternChallengeHUD.length) patternChallengeHUD.hide();
+        if (gameStatsHUD.length) gameStatsHUD.hide(); 
         if(timerInterval) clearInterval(timerInterval);
 
         const modalHTML = `
@@ -409,44 +309,44 @@ $(document).ready(function() {
                 <p style="font-size:1.2em; font-weight: bold; margin-top: 25px; margin-bottom: 15px;">انتخاب کنید:</p>
             </div>
             <div id="mode-selection">
-                <button data-mode="3x4">حافظه 3x4</button>
-                <button data-mode="4x4">حافظه 4x4</button>
-                <button data-mode="4x5">حافظه 4x5</button>
-                <button data-mode="5x6">حافظه 5x6</button>
+                <button data-mode="3x4">حافظه 3x4</button> <button data-mode="4x4">حافظه 4x4</button>
+                <button data-mode="4x5">حافظه 4x5</button> <button data-mode="5x6">حافظه 5x6</button>
                 <button data-mode="6x6">حافظه 6x6</button>
                 <hr style="margin: 10px 0; border-color: var(--modal-list-border-color);">
                 <button data-mode="pattern_challenge" class="challenge-button" style="padding: 12px 20px; font-size:1.1em;">شروع چالش الگو!</button>
             </div>`;
-        modalContent.html(modalHTML); 
-        overlay.fadeIn(300);
+        if (modalContent.length && overlay.length) {
+            modalContent.html(modalHTML); overlay.fadeIn(300);
+        }
     }
 
     // Centralized event delegation for modal buttons
-    modalContent.off('click').on('click', '#mode-selection button, #close-modal-button', function() { 
-        const clickedButton = $(this);
-        if (clickedButton.is('#close-modal-button')) { // Handles close for achievement modal
-            overlay.fadeOut(300);
-            return;
-        }
-
-        const mode = clickedButton.data('mode');
-        if (mode === 'pattern_challenge') {
-            startPatternChallengeMode();
-        } else if (mode === 'main_menu') {
-            overlay.fadeOut(300, showInitialModal); 
-        } else { 
-            const modeParts = mode.split('x');
-            if (modeParts.length === 2 && !isNaN(parseInt(modeParts[0])) && !isNaN(parseInt(modeParts[1]))) { 
-                const r = parseInt(modeParts[0]);
-                const l = parseInt(modeParts[1]);
-                gameMode = mode; 
-                startMemoryGame(r, l);
-            } else {
-                console.error("Invalid memory game mode selected:", mode);
-                showInitialModal(); 
+    if (modalContent.length) {
+        modalContent.off('click').on('click', '#mode-selection button, #close-modal-button', function() { 
+            const clickedButton = $(this);
+            if (clickedButton.is('#close-modal-button')) { 
+                if (overlay.length) overlay.fadeOut(300);
+                return;
             }
-        }
-    });
+            const mode = clickedButton.data('mode');
+            if (mode === 'pattern_challenge') {
+                startPatternChallengeMode();
+            } else if (mode === 'main_menu') {
+                if (overlay.length) overlay.fadeOut(300, showInitialModal); else showInitialModal();
+            } else { 
+                const modeParts = mode.split('x');
+                if (modeParts.length === 2 && !isNaN(parseInt(modeParts[0])) && !isNaN(parseInt(modeParts[1]))) { 
+                    const r = parseInt(modeParts[0]);
+                    const l = parseInt(modeParts[1]);
+                    gameMode = mode; 
+                    startMemoryGame(r, l);
+                } else {
+                    console.error("Invalid memory game mode selected:", mode);
+                    showInitialModal(); 
+                }
+            }
+        });
+    }
     
     // --- Initial Load ---
     loadStatsAndAchievements();

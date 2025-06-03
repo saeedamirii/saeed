@@ -1,60 +1,0 @@
-<!DOCTYPE html>
-<html lang="fa" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>بازی حافظه | ساخته سعید</title>
-    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
-    <link rel="stylesheet" href="gameStyle.css">
-</head>
-<body>
-    <div id="loading-overlay">
-        <div class="loading-spinner"></div>
-        <p class="loading-text">بارگذاری بازی...</p>
-    </div>
-
-    <div id="overlay">
-        <div id="modal-content">
-            </div>
-    </div>
-
-    <header id="game-header">
-        <div id="header-buttons-left">
-            <button id="theme-toggle-button" title="تغییر تم">🌙</button>
-            <button id="achievements-button" title="مدال‌ها و دستاوردها">🎖️</button>
-            <button id="music-toggle-button" title="پخش موزیک">🎵</button>
-        </div>
-        <div id="logo">بازی حافظه</div>
-        <div id="game-stats">
-            <span id="moves-display">حرکت‌ها: ۰</span>
-            <span id="time-display">زمان: ۰۰:۰۰</span>
-        </div>
-    </header>
-
-    <div id="pattern-challenge-hud" style="display: none;">
-        <div id="hud-left-stats">
-            <div>مرحله: <span id="hud-stage">۱</span></div>
-            <div>امتیاز: <span id="hud-score">۰</span></div>
-        </div>
-        <div id="hud-lives">
-            </div>
-    </div>
-
-    <main>
-        <table id="game-board" cellspacing="0">
-            </table>
-    </main>
-
-    <footer>
-        <p class="credit-text">ساخته شده با ❤️ توسط سعید</p>
-    </footer>
-
-    <div id="toast-notification"></div>
-    <audio id="background-music" src="sound/sound.mp3" loop preload="auto"></audio>
-
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="gameScript.js"></script>
-</body>
-                                                                </html>
-

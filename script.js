@@ -61,22 +61,31 @@ document.addEventListener('DOMContentLoaded', () => {
         sequenceInput.focus();
     };
     
-    // **اصلاح ۱: پیام دقیق برای پاسخ صحیح**
+    // =================================================================
+    // ### رفع اشکال اصلی اینجاست ###
+    // =================================================================
     const handleCorrectAnswer = () => {
-        level++;
+        level++; // مرحله زیاد می‌شود
         if (level - 1 > highScore) {
             highScore = level - 1;
             localStorage.setItem('sequenceHighScore', highScore);
         }
-        messageDisplay.textContent = 'عالی بود بریم مرحله بعد'; // <--- پیام اصلاح شد
+        
+        // **رفع اشکال ۲:** نمایشگر مراحل بلافاصله آپدیت می‌شود
+        updateMainUI(); 
+
+        messageDisplay.textContent = 'عالی بود بریم مرحله بعد';
         messageDisplay.className = 'message correct';
-        resetRoundState();
-        setTimeout(startRound, 1500);
+        
+        // **رفع اشکال ۱:** پاک کردن پیام به داخل تایم‌اوت منتقل شد
+        // تا پیام موفقیت برای ۱.۵ ثانیه نمایش داده شود
+        setTimeout(() => {
+            resetRoundState(); // حالت‌ها برای مرحله بعد آماده می‌شوند
+            startRound();
+        }, 1500);
     };
 
-    // **اصلاح ۲: منطق دقیق برای پاسخ غلط و باخت**
     const handleWrongAnswer = () => {
-        // تا زمانی که فرصت راهنما وجود دارد، از آن استفاده می‌شود
         if (hintChances > 0) {
             hintChances--;
             messageDisplay.textContent = 'اشتباه بود! از راهنمای خودکار استفاده شد.';
@@ -93,18 +102,18 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             updateFakeInput(coloredHTML);
         
-        // وقتی فرصت راهنما تمام شد، جان‌ها کم می‌شوند
         } else {
             lives--;
-            // اگر هنوز جان باقی مانده باشد
+            updateMainUI(); // آپدیت برای نمایش کم شدن جان
             if (lives > 0) {
                 messageDisplay.textContent = `فرصت راهنما تمام شد! یک جان از دست دادی.`;
                 messageDisplay.className = 'message wrong';
-                resetRoundState();
-                setTimeout(startRound, 2000); 
-            // اگر تمام جان‌ها تمام شوند
+                setTimeout(() => {
+                    resetRoundState();
+                    startRound();
+                }, 2000); 
             } else {
-                messageDisplay.textContent = `باختی! دنباله صحیح: ${sequence.join('')}`; // <--- پیام باختن اصلاح شد
+                messageDisplay.textContent = `باختی! دنباله صحیح: ${sequence.join('')}`;
                 messageDisplay.className = 'message wrong';
                 displayText.textContent = 'GAME OVER';
                 setInputsDisabled(true);
@@ -138,11 +147,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const startRound = () => {
         sequence = [];
         for (let i = 0; i < level; i++) sequence.push(Math.floor(Math.random() * 9) + 1);
-        resetRoundState();
         displaySequence();
     };
     
-    // **اصلاح ۳: شروع بازی با جان و فرصت کامل**
     const startGame = () => {
         level = 1;
         lives = 3;

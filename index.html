@@ -19,6 +19,10 @@
                 <div id="lives-display" class="lives"></div>
                 <span>بالاترین امتیاز: <span id="highscore-display">0</span></span>
             </div>
+            <div id="hint-display-container">
+                <span id="hint-count">5</span>
+                <span>فرصت راهنما</span>
+            </div>
         </header>
 
         <main>
@@ -28,8 +32,12 @@
 
             <div id="message-display" class="message"></div>
 
-            <div class="input-area">
-                <input type="text" id="sequence-input" placeholder="دنباله را وارد کن..." disabled />
+            <div class="input-wrapper">
+                <div id="fake-input" class="input-display" dir="ltr"></div>
+                <input type="text" id="sequence-input" autocomplete="off" />
+            </div>
+
+            <div class="button-group">
                 <button id="sequence-submit-btn" disabled>تایید</button>
             </div>
         </main>

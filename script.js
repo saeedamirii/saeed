@@ -61,23 +61,25 @@ document.addEventListener('DOMContentLoaded', () => {
         sequenceInput.focus();
     };
     
+    // **اصلاح ۱: پیام دقیق برای پاسخ صحیح**
     const handleCorrectAnswer = () => {
         level++;
         if (level - 1 > highScore) {
             highScore = level - 1;
             localStorage.setItem('sequenceHighScore', highScore);
         }
-        messageDisplay.textContent = 'عالی بود! میریم مرحله بعد...';
+        messageDisplay.textContent = 'عالی بود بریم مرحله بعد'; // <--- پیام اصلاح شد
         messageDisplay.className = 'message correct';
         resetRoundState();
         setTimeout(startRound, 1500);
     };
 
+    // **اصلاح ۲: منطق دقیق برای پاسخ غلط و باخت**
     const handleWrongAnswer = () => {
-        // Tier 1: Use Hint Chances
+        // تا زمانی که فرصت راهنما وجود دارد، از آن استفاده می‌شود
         if (hintChances > 0) {
             hintChances--;
-            messageDisplay.textContent = 'اشتباه بود! از راهنما استفاده شد.';
+            messageDisplay.textContent = 'اشتباه بود! از راهنمای خودکار استفاده شد.';
             messageDisplay.className = 'message wrong';
 
             const userAnswer = sequenceInput.value.split('');
@@ -91,17 +93,19 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             updateFakeInput(coloredHTML);
         
-        // Tier 2: Lose a Life
+        // وقتی فرصت راهنما تمام شد، جان‌ها کم می‌شوند
         } else {
             lives--;
+            // اگر هنوز جان باقی مانده باشد
             if (lives > 0) {
                 messageDisplay.textContent = `فرصت راهنما تمام شد! یک جان از دست دادی.`;
                 messageDisplay.className = 'message wrong';
                 resetRoundState();
-                setTimeout(startRound, 2000); // Restart same level
+                setTimeout(startRound, 2000); 
+            // اگر تمام جان‌ها تمام شوند
             } else {
-                // Tier 3: Game Over
-                messageDisplay.textContent = `بازی تمام شد! دنباله صحیح: ${sequence.join('')}`;
+                messageDisplay.textContent = `باختی! دنباله صحیح: ${sequence.join('')}`; // <--- پیام باختن اصلاح شد
+                messageDisplay.className = 'message wrong';
                 displayText.textContent = 'GAME OVER';
                 setInputsDisabled(true);
                 startBtn.disabled = false;
@@ -137,7 +141,8 @@ document.addEventListener('DOMContentLoaded', () => {
         resetRoundState();
         displaySequence();
     };
-
+    
+    // **اصلاح ۳: شروع بازی با جان و فرصت کامل**
     const startGame = () => {
         level = 1;
         lives = 3;

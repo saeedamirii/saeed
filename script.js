@@ -61,9 +61,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (newUnlock) {
             localStorage.setItem('sequenceAchievements', JSON.stringify(achievements));
             updateMedalsUI();
-            messageDisplay.textContent = 'مدال جدید باز شد!';
-            messageDisplay.className = 'message unlock';
+            return true; // نشان می‌دهد که مدال جدید باز شده
         }
+        return false;
     };
     
     const updateFakeInput = (htmlContent = '') => { fakeInput.innerHTML = htmlContent || `<span>${sequenceInput.value.split('').join('</span><span>')}</span>`; };
@@ -90,6 +90,9 @@ document.addEventListener('DOMContentLoaded', () => {
         sequenceInput.focus();
     };
     
+    // =================================================================
+    // ### رفع باگ اصلی اینجاست ###
+    // =================================================================
     const handleCorrectAnswer = () => {
         const completedLevel = level;
         level++;
@@ -99,15 +102,20 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         updateMainUI(); 
+        setInputsDisabled(true); // غیرفعال کردن اینپوت تا مرحله بعد
         
-        messageDisplay.textContent = 'عالی بود بریم مرحله بعد';
-        messageDisplay.className = 'message correct';
-        
-        checkAndUnlockMedal(completedLevel);
+        const newMedalUnlocked = checkAndUnlockMedal(completedLevel);
 
+        if (newMedalUnlocked) {
+            messageDisplay.textContent = 'مدال جدید باز شد!';
+            messageDisplay.className = 'message unlock';
+        } else {
+            messageDisplay.textContent = 'عالی بود بریم مرحله بعد';
+            messageDisplay.className = 'message correct';
+        }
+        
         setTimeout(() => {
             resetRoundState();
-            if (messageDisplay.classList.contains('unlock')) messageDisplay.className = 'message'; // Clear unlock message
             startRound();
         }, 1500);
     };
@@ -135,6 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (lives > 0) {
                 messageDisplay.textContent = `فرصت راهنما تمام شد! یک جان از دست دادی.`;
                 messageDisplay.className = 'message wrong';
+                setInputsDisabled(true);
                 setTimeout(() => {
                     resetRoundState();
                     startRound();
@@ -152,10 +161,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const checkAnswer = () => { (sequenceInput.value === sequence.join('')) ? handleCorrectAnswer() : handleWrongAnswer(); };
     const setInputsDisabled = (state) => { submitBtn.disabled = state; sequenceInput.disabled = state; };
     const resetRoundState = () => {
-        if (!messageDisplay.classList.contains('unlock')) {
-             messageDisplay.textContent = '';
-             messageDisplay.className = 'message';
-        }
+        messageDisplay.textContent = '';
+        messageDisplay.className = 'message';
         sequenceInput.value = '';
         updateFakeInput();
     };
@@ -170,9 +177,7 @@ document.addEventListener('DOMContentLoaded', () => {
         level = 1;
         lives = 3;
         hintChances = 5;
-        // **دکمه شروع مجدد همیشه فعال است و متنش تغییر می‌کند**
         startBtn.textContent = 'شروع مجدد';
-        
         updateMainUI();
         startRound();
     };

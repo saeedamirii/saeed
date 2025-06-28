@@ -1,155 +1,161 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // --- DOM Elements ---
+    // DOM Elements
     const levelDisplay = document.getElementById('level-display');
     const highscoreDisplay = document.getElementById('highscore-display');
-    const livesDisplay = document.getElementById('lives-display'); // New
+    const livesDisplay = document.getElementById('lives-display');
+    const hintCountDisplay = document.getElementById('hint-count');
     const displayText = document.getElementById('display-text');
     const sequenceInput = document.getElementById('sequence-input');
+    const fakeInput = document.getElementById('fake-input');
     const submitBtn = document.getElementById('sequence-submit-btn');
     const startBtn = document.getElementById('start-sequence-btn');
     const messageDisplay = document.getElementById('message-display');
 
-    // --- Game State Variables ---
-    let level = 1;
-    let sequence = [];
-    let lives = 3; // New
-    let isPlaying = false; 
+    // Game State
+    let level = 1, sequence = [], lives = 3, hintChances = 5, isPlaying = false;
     let highScore = localStorage.getItem('sequenceHighScore') || 0;
 
-    // --- Utility Functions ---
     const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-    const updateUI = () => {
+    const updateMainUI = () => {
         levelDisplay.textContent = level;
         highscoreDisplay.textContent = highScore;
+        hintCountDisplay.textContent = hintChances;
         updateLivesUI();
     };
 
-    // New function to render hearts
     const updateLivesUI = () => {
         livesDisplay.innerHTML = '';
         for (let i = 1; i <= 3; i++) {
             const heart = document.createElement('span');
             heart.classList.add('heart');
-            if (i > lives) {
-                heart.classList.add('lost');
-            }
+            if (i > lives) heart.classList.add('lost');
             heart.textContent = '♥';
             livesDisplay.appendChild(heart);
         }
     };
 
-    // --- Core Game Logic ---
-    const generateSequence = () => {
-        sequence = [];
-        for (let i = 0; i < level; i++) {
-            sequence.push(Math.floor(Math.random() * 9) + 1);
-        }
+    const updateFakeInput = (htmlContent = '') => {
+        fakeInput.innerHTML = htmlContent || `<span>${sequenceInput.value.split('').join('</span><span>')}</span>`;
     };
 
     const displaySequence = async () => {
         isPlaying = true;
-        startBtn.disabled = true;
-        sequenceInput.disabled = true;
-        submitBtn.disabled = true;
-        
+        setInputsDisabled(true);
         displayText.textContent = 'آماده؟';
         await sleep(1000);
-
+        
+        const displayTime = Math.max(300, 800 - (level * 30));
+        const pauseTime = Math.max(150, 400 - (level * 15));
+        
         for (const num of sequence) {
             displayText.textContent = num;
-            await sleep(600);
+            await sleep(displayTime);
             displayText.textContent = '';
-            await sleep(200);
+            await sleep(pauseTime);
         }
 
         displayText.textContent = '؟';
-        sequenceInput.disabled = false;
-        sequenceInput.focus();
-        submitBtn.disabled = false;
         isPlaying = false;
+        setInputsDisabled(false);
+        sequenceInput.focus();
     };
-
+    
     const handleCorrectAnswer = () => {
         level++;
-        if (level-1 > highScore) { // Update high score for the level just completed
+        if (level - 1 > highScore) {
             highScore = level - 1;
             localStorage.setItem('sequenceHighScore', highScore);
         }
         messageDisplay.textContent = 'عالی بود! میریم مرحله بعد...';
         messageDisplay.className = 'message correct';
-        updateUI();
-
-        setTimeout(() => {
-            messageDisplay.textContent = '';
-            messageDisplay.className = 'message';
-            startRound();
-        }, 1500);
+        resetRoundState();
+        setTimeout(startRound, 1500);
     };
 
-    // This function is heavily modified
     const handleWrongAnswer = () => {
-        lives--;
-        updateLivesUI();
-        messageDisplay.className = 'message wrong';
+        // Tier 1: Use Hint Chances
+        if (hintChances > 0) {
+            hintChances--;
+            messageDisplay.textContent = 'اشتباه بود! از راهنما استفاده شد.';
+            messageDisplay.className = 'message wrong';
 
-        if (lives > 0) {
-            messageDisplay.textContent = `اشتباه بود! ${lives} جان دیگر باقیست.`;
-            // Let the player try the same level again
-            setTimeout(() => {
-                messageDisplay.textContent = 'دوباره به دنباله دقت کن...';
-                messageDisplay.className = 'message';
-                displaySequence(); // Re-display the same sequence
-            }, 2000);
+            const userAnswer = sequenceInput.value.split('');
+            const correctSequenceChars = sequence.join('').split('');
+            let coloredHTML = '';
+
+            for (let i = 0; i < correctSequenceChars.length; i++) {
+                const char = (i < userAnswer.length) ? userAnswer[i] : '_';
+                const charClass = (i < userAnswer.length && userAnswer[i] === correctSequenceChars[i]) ? 'char-correct' : 'char-wrong';
+                coloredHTML += `<span class="${charClass}">${char}</span>`;
+            }
+            updateFakeInput(coloredHTML);
+        
+        // Tier 2: Lose a Life
         } else {
-            // Game Over
-            messageDisplay.textContent = `بازی تمام شد! دنباله صحیح: ${sequence.join('')}`;
-            displayText.textContent = 'GAME OVER';
-            level = 1;
-            lives = 3;
-            startBtn.disabled = false;
-            startBtn.textContent = 'شروع مجدد';
+            lives--;
+            if (lives > 0) {
+                messageDisplay.textContent = `فرصت راهنما تمام شد! یک جان از دست دادی.`;
+                messageDisplay.className = 'message wrong';
+                resetRoundState();
+                setTimeout(startRound, 2000); // Restart same level
+            } else {
+                // Tier 3: Game Over
+                messageDisplay.textContent = `بازی تمام شد! دنباله صحیح: ${sequence.join('')}`;
+                displayText.textContent = 'GAME OVER';
+                setInputsDisabled(true);
+                startBtn.disabled = false;
+                startBtn.textContent = 'شروع مجدد';
+            }
         }
+        updateMainUI();
     };
 
     const checkAnswer = () => {
-        const userAnswer = sequenceInput.value;
-        sequenceInput.disabled = true;
-        submitBtn.disabled = true;
-        
-        if (userAnswer === sequence.join('')) {
+        if (sequenceInput.value === sequence.join('')) {
             handleCorrectAnswer();
         } else {
             handleWrongAnswer();
         }
-        sequenceInput.value = '';
     };
     
+    const setInputsDisabled = (state) => {
+        submitBtn.disabled = state;
+        sequenceInput.disabled = state;
+    };
+    
+    const resetRoundState = () => {
+        messageDisplay.textContent = '';
+        messageDisplay.className = 'message';
+        sequenceInput.value = '';
+        updateFakeInput();
+    };
+
     const startRound = () => {
-        generateSequence();
+        sequence = [];
+        for (let i = 0; i < level; i++) sequence.push(Math.floor(Math.random() * 9) + 1);
+        resetRoundState();
         displaySequence();
     };
 
-    // Modified to reset lives on new game
     const startGame = () => {
         level = 1;
-        lives = 3; 
-        messageDisplay.textContent = '';
-        messageDisplay.className = 'message';
-        updateUI();
-        startBtn.textContent = 'شروع';
+        lives = 3;
+        hintChances = 5;
+        startBtn.disabled = true;
+        updateMainUI();
         startRound();
     };
 
-    // --- Event Listeners ---
     startBtn.addEventListener('click', startGame);
     submitBtn.addEventListener('click', checkAnswer);
     sequenceInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && !submitBtn.disabled) {
-            checkAnswer();
-        }
+        if (e.key === 'Enter' && !submitBtn.disabled) checkAnswer();
+    });
+    sequenceInput.addEventListener('input', () => {
+        updateFakeInput();
+        submitBtn.disabled = sequenceInput.value.length !== sequence.length;
     });
 
-    // --- Initial Load ---
-    updateUI();
+    updateMainUI();
 });

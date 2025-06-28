@@ -8,6 +8,7 @@
     --border-color: rgba(0, 245, 255, 0.3);
     --success-color: #4caf50;
     --error-color: #f44336;
+    --heart-color: var(--secondary-accent);
 }
 
 * {
@@ -52,9 +53,30 @@ body {
 
 .game-info {
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between; /* Changed to space-between */
+    align-items: center;
     font-size: 1rem;
 }
+
+/* --- Lives (Hearts) Display --- */
+.lives {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.heart {
+    color: var(--heart-color);
+    font-size: 1.5rem;
+    text-shadow: 0 0 5px var(--heart-color);
+    transition: all 0.3s ease;
+}
+
+.heart.lost {
+    color: #4a4e69;
+    text-shadow: none;
+    transform: scale(0.8);
+}
+
 
 /* --- Display Box --- */
 .display-box {

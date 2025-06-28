@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بازی دنباله سریع</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="game-container">
+        <header class="game-header">
+            <h1>دنباله سریع</h1>
+            <div class="game-info">
+                <span>مرحله: <span id="level-display">1</span></span>
+                <span>بالاترین امتیاز: <span id="highscore-display">0</span></span>
+            </div>
+        </header>
+
+        <main>
+            <div id="sequence-display" class="display-box">
+                <p id="display-text">برای شروع، دکمه "شروع" را بزن</p>
+            </div>
+
+            <div id="message-display" class="message"></div>
+
+            <div class="input-area">
+                <input type="text" id="sequence-input" placeholder="دنباله را وارد کن..." disabled />
+                <button id="sequence-submit-btn" disabled>تایید</button>
+            </div>
+        </main>
+        
+        <footer>
+            <button id="start-sequence-btn" class="start-btn">شروع</button>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

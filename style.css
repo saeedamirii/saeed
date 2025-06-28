@@ -44,6 +44,27 @@ body {
 .heart { color: var(--heart-color); font-size: 1.5rem; text-shadow: 0 0 5px var(--heart-color); transition: all 0.3s ease; }
 .heart.lost { color: #4a4e69; text-shadow: none; transform: scale(0.8); }
 
+/* --- Medal Styles --- */
+#medals-container {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+.medal {
+    font-size: 2rem;
+    opacity: 0.3;
+    filter: grayscale(100%);
+    transition: all 0.5s ease;
+    cursor: help;
+}
+.medal.unlocked {
+    opacity: 1;
+    filter: grayscale(0%);
+    transform: scale(1.1) rotate(-5deg);
+}
+
+
 .display-box {
     background-color: var(--bg-color);
     border: 2px solid var(--border-color);
@@ -81,3 +102,4 @@ button:not(:disabled):hover { transform: translateY(-3px); box-shadow: 0 4px 15p
 .message { min-height: 24px; margin-bottom: 1rem; font-size: 1.1rem; font-weight: 700; }
 .correct { color: var(--success-color); }
 .wrong { color: var(--error-color); }
+.unlock { color: var(--hint-color); }

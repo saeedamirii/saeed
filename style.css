@@ -34,6 +34,26 @@ body {
     text-align: center;
 }
 
+/* --- Game Guide Styles --- */
+.game-guide {
+    background: rgba(0,0,0,0.2);
+    border-radius: 8px;
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+    text-align: right;
+    border: 1px solid var(--border-color);
+}
+.game-guide summary {
+    font-weight: 700;
+    cursor: pointer;
+    color: var(--primary-accent);
+}
+.game-guide p {
+    padding-top: 0.5rem;
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
 .game-header { margin-bottom: 1rem; }
 .game-header h1 { color: var(--primary-accent); font-size: 2rem; margin-bottom: 0.5rem; text-shadow: 0 0 10px var(--primary-accent); }
 .game-info { display: flex; justify-content: space-between; align-items: center; font-size: 1rem; margin-bottom: 0.5rem; }
@@ -44,26 +64,9 @@ body {
 .heart { color: var(--heart-color); font-size: 1.5rem; text-shadow: 0 0 5px var(--heart-color); transition: all 0.3s ease; }
 .heart.lost { color: #4a4e69; text-shadow: none; transform: scale(0.8); }
 
-/* --- Medal Styles --- */
-#medals-container {
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-    margin-bottom: 1rem;
-}
-.medal {
-    font-size: 2rem;
-    opacity: 0.3;
-    filter: grayscale(100%);
-    transition: all 0.5s ease;
-    cursor: help;
-}
-.medal.unlocked {
-    opacity: 1;
-    filter: grayscale(0%);
-    transform: scale(1.1) rotate(-5deg);
-}
-
+#medals-container { display: flex; justify-content: center; gap: 1rem; margin-bottom: 1rem; }
+.medal { font-size: 2rem; opacity: 0.3; filter: grayscale(100%); transition: all 0.5s ease; cursor: help; }
+.medal.unlocked { opacity: 1; filter: grayscale(0%); transform: scale(1.1) rotate(-5deg); }
 
 .display-box {
     background-color: var(--bg-color);

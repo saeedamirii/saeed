@@ -10,10 +10,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const submitBtn = document.getElementById('sequence-submit-btn');
     const startBtn = document.getElementById('start-sequence-btn');
     const messageDisplay = document.getElementById('message-display');
+    const medals = {
+        bronze: document.getElementById('medal-bronze'),
+        silver: document.getElementById('medal-silver'),
+        gold: document.getElementById('medal-gold'),
+        master: document.getElementById('medal-master'),
+    };
 
     // Game State
     let level = 1, sequence = [], lives = 3, hintChances = 5, isPlaying = false;
     let highScore = localStorage.getItem('sequenceHighScore') || 0;
+    let achievements = JSON.parse(localStorage.getItem('sequenceAchievements')) || { bronze: false, silver: false, gold: false, master: false };
 
     const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -22,6 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
         highscoreDisplay.textContent = highScore;
         hintCountDisplay.textContent = hintChances;
         updateLivesUI();
+        updateMedalsUI();
     };
 
     const updateLivesUI = () => {
@@ -35,9 +43,30 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    const updateFakeInput = (htmlContent = '') => {
-        fakeInput.innerHTML = htmlContent || `<span>${sequenceInput.value.split('').join('</span><span>')}</span>`;
+    const updateMedalsUI = () => {
+        for (const medalKey in achievements) {
+            if (achievements[medalKey]) {
+                medals[medalKey].classList.add('unlocked');
+            }
+        }
     };
+
+    const checkAndUnlockMedal = (completedLevel) => {
+        let newUnlock = false;
+        if (completedLevel >= 5 && !achievements.bronze) { achievements.bronze = true; newUnlock = true; }
+        if (completedLevel >= 10 && !achievements.silver) { achievements.silver = true; newUnlock = true; }
+        if (completedLevel >= 15 && !achievements.gold) { achievements.gold = true; newUnlock = true; }
+        if (completedLevel >= 20 && !achievements.master) { achievements.master = true; newUnlock = true; }
+        
+        if (newUnlock) {
+            localStorage.setItem('sequenceAchievements', JSON.stringify(achievements));
+            updateMedalsUI();
+            messageDisplay.textContent = 'مدال جدید باز شد!';
+            messageDisplay.className = 'message unlock';
+        }
+    };
+    
+    const updateFakeInput = (htmlContent = '') => { fakeInput.innerHTML = htmlContent || `<span>${sequenceInput.value.split('').join('</span><span>')}</span>`; };
 
     const displaySequence = async () => {
         isPlaying = true;
@@ -61,26 +90,24 @@ document.addEventListener('DOMContentLoaded', () => {
         sequenceInput.focus();
     };
     
-    // =================================================================
-    // ### رفع اشکال اصلی اینجاست ###
-    // =================================================================
     const handleCorrectAnswer = () => {
-        level++; // مرحله زیاد می‌شود
-        if (level - 1 > highScore) {
-            highScore = level - 1;
+        const completedLevel = level;
+        level++;
+        if (completedLevel > highScore) {
+            highScore = completedLevel;
             localStorage.setItem('sequenceHighScore', highScore);
         }
         
-        // **رفع اشکال ۲:** نمایشگر مراحل بلافاصله آپدیت می‌شود
         updateMainUI(); 
-
+        
         messageDisplay.textContent = 'عالی بود بریم مرحله بعد';
         messageDisplay.className = 'message correct';
         
-        // **رفع اشکال ۱:** پاک کردن پیام به داخل تایم‌اوت منتقل شد
-        // تا پیام موفقیت برای ۱.۵ ثانیه نمایش داده شود
+        checkAndUnlockMedal(completedLevel);
+
         setTimeout(() => {
-            resetRoundState(); // حالت‌ها برای مرحله بعد آماده می‌شوند
+            resetRoundState();
+            if (messageDisplay.classList.contains('unlock')) messageDisplay.className = 'message'; // Clear unlock message
             startRound();
         }, 1500);
     };
@@ -104,7 +131,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         } else {
             lives--;
-            updateMainUI(); // آپدیت برای نمایش کم شدن جان
+            updateMainUI();
             if (lives > 0) {
                 messageDisplay.textContent = `فرصت راهنما تمام شد! یک جان از دست دادی.`;
                 messageDisplay.className = 'message wrong';
@@ -117,29 +144,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 messageDisplay.className = 'message wrong';
                 displayText.textContent = 'GAME OVER';
                 setInputsDisabled(true);
-                startBtn.disabled = false;
-                startBtn.textContent = 'شروع مجدد';
             }
         }
         updateMainUI();
     };
 
-    const checkAnswer = () => {
-        if (sequenceInput.value === sequence.join('')) {
-            handleCorrectAnswer();
-        } else {
-            handleWrongAnswer();
-        }
-    };
-    
-    const setInputsDisabled = (state) => {
-        submitBtn.disabled = state;
-        sequenceInput.disabled = state;
-    };
-    
+    const checkAnswer = () => { (sequenceInput.value === sequence.join('')) ? handleCorrectAnswer() : handleWrongAnswer(); };
+    const setInputsDisabled = (state) => { submitBtn.disabled = state; sequenceInput.disabled = state; };
     const resetRoundState = () => {
-        messageDisplay.textContent = '';
-        messageDisplay.className = 'message';
+        if (!messageDisplay.classList.contains('unlock')) {
+             messageDisplay.textContent = '';
+             messageDisplay.className = 'message';
+        }
         sequenceInput.value = '';
         updateFakeInput();
     };
@@ -154,20 +170,21 @@ document.addEventListener('DOMContentLoaded', () => {
         level = 1;
         lives = 3;
         hintChances = 5;
-        startBtn.disabled = true;
+        // **دکمه شروع مجدد همیشه فعال است و متنش تغییر می‌کند**
+        startBtn.textContent = 'شروع مجدد';
+        
         updateMainUI();
         startRound();
     };
 
     startBtn.addEventListener('click', startGame);
     submitBtn.addEventListener('click', checkAnswer);
-    sequenceInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && !submitBtn.disabled) checkAnswer();
-    });
+    sequenceInput.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !submitBtn.disabled) checkAnswer(); });
     sequenceInput.addEventListener('input', () => {
         updateFakeInput();
         submitBtn.disabled = sequenceInput.value.length !== sequence.length;
     });
 
+    // --- Initial Load ---
     updateMainUI();
 });

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>بازی دنباله سریع</title>
+    <title>بازی کلمات گمشده</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700&display=swap" rel="stylesheet">
@@ -12,59 +12,43 @@
 <body>
 
     <div id="game-container">
-        <details class="game-guide">
-            <summary>راهنمای بازی</summary>
-            <p>
-                دنباله اعداد را به خاطر بسپار و آن را تکرار کن.
-                <br>
-                - ۵ فرصت راهنمای خودکار برای نمایش ارقام غلط داری.
-                <br>
-                - بعد از اتمام راهنما، با هر اشتباه یک جان از دست می‌دهی.
-                <br>
-                <strong>مدال‌ها:</strong>
-                🥉مرحله ۵, 🥈مرحله ۱۰, 🥇مرحله ۱۵, 💎مرحله ۲۰
-            </p>
-        </details>
 
-        <header class="game-header">
-            <div id="medals-container">
-                <span id="medal-bronze" class="medal" title="رسیدن به مرحله ۵">🥉</span>
-                <span id="medal-silver" class="medal" title="رسیدن به مرحله ۱۰">🥈</span>
-                <span id="medal-gold" class="medal" title="رسیدن به مرحله ۱۵">🥇</span>
-                <span id="medal-master" class="medal" title="رسیدن به مرحله ۲۰">💎</span>
-            </div>
-            <h1>دنباله سریع</h1>
-            <div class="game-info">
-                <span>مرحله: <span id="level-display">1</span></span>
-                <div id="lives-display" class="lives"></div>
-                <span>بالاترین امتیاز: <span id="highscore-display">0</span></span>
-            </div>
-            <div id="hint-display-container">
-                <span id="hint-count">5</span>
-                <span>فرصت راهنما</span>
-            </div>
-        </header>
+        <div id="start-view" class="view active">
+            <h1 class="game-title">کلمات گمشده</h1>
+            <p class="game-description">کلمات را به خاطر بسپار و در زمان مناسب به یاد بیاور!</p>
+            <button id="start-game-btn" class="start-btn">شروع بازی</button>
+        </div>
 
-        <main>
-            <div id="sequence-display" class="display-box">
-                <p id="display-text">برای شروع، دکمه "شروع" را بزن</p>
-            </div>
+        <div id="memorize-view" class="view">
+            <div id="timer-display" class="timer">۲۰</div>
+            <h2>این کلمات را به خاطر بسپار:</h2>
+            <div id="word-list" class="word-list-box">
+                </div>
+        </div>
 
-            <div id="message-display" class="message"></div>
+        <div id="recall-view" class="view">
+            <h2>کلماتی که یادت میاد رو بنویس:</h2>
+            <p class="game-description">(هر کلمه در یک خط جدید)</p>
+            <textarea id="recall-input" rows="10" placeholder="اینجا تایپ کن..."></textarea>
+            <button id="submit-words-btn" class="start-btn">بررسی نتایج</button>
+        </div>
 
-            <div class="input-wrapper">
-                <div id="fake-input" class="input-display" dir="ltr"></div>
-                <input type="text" id="sequence-input" autocomplete="off" />
+        <div id="results-view" class="view">
+            <h2>نتایج شما</h2>
+            <div id="score-display" class="score"></div>
+            <div class="results-columns">
+                <div class="column">
+                    <h3>✅ درست</h3>
+                    <ul id="correct-words-list"></ul>
+                </div>
+                <div class="column">
+                    <h3>❌ فراموش شده</h3>
+                    <ul id="missed-words-list"></ul>
+                </div>
             </div>
+            <button id="play-again-btn" class="start-btn">بازی مجدد</button>
+        </div>
 
-            <div class="button-group">
-                <button id="sequence-submit-btn" disabled>تایید</button>
-            </div>
-        </main>
-        
-        <footer>
-            <button id="start-sequence-btn" class="start-btn">شروع</button>
-        </footer>
     </div>
 
     <script src="script.js"></script>

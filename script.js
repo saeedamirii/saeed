@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- DOM Elements ---
     const levelDisplay = document.getElementById('level-display');
     const highscoreDisplay = document.getElementById('highscore-display');
+    const livesDisplay = document.getElementById('lives-display'); // New
     const displayText = document.getElementById('display-text');
     const sequenceInput = document.getElementById('sequence-input');
     const submitBtn = document.getElementById('sequence-submit-btn');
@@ -11,7 +12,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Game State Variables ---
     let level = 1;
     let sequence = [];
-    let isPlaying = false; // Is the sequence currently being shown?
+    let lives = 3; // New
+    let isPlaying = false; 
     let highScore = localStorage.getItem('sequenceHighScore') || 0;
 
     // --- Utility Functions ---
@@ -20,13 +22,28 @@ document.addEventListener('DOMContentLoaded', () => {
     const updateUI = () => {
         levelDisplay.textContent = level;
         highscoreDisplay.textContent = highScore;
+        updateLivesUI();
+    };
+
+    // New function to render hearts
+    const updateLivesUI = () => {
+        livesDisplay.innerHTML = '';
+        for (let i = 1; i <= 3; i++) {
+            const heart = document.createElement('span');
+            heart.classList.add('heart');
+            if (i > lives) {
+                heart.classList.add('lost');
+            }
+            heart.textContent = '♥';
+            livesDisplay.appendChild(heart);
+        }
     };
 
     // --- Core Game Logic ---
     const generateSequence = () => {
         sequence = [];
         for (let i = 0; i < level; i++) {
-            sequence.push(Math.floor(Math.random() * 9) + 1); // Numbers 1-9
+            sequence.push(Math.floor(Math.random() * 9) + 1);
         }
     };
 
@@ -36,13 +53,14 @@ document.addEventListener('DOMContentLoaded', () => {
         sequenceInput.disabled = true;
         submitBtn.disabled = true;
         
-        await sleep(1000); // Pause before showing the sequence
+        displayText.textContent = 'آماده؟';
+        await sleep(1000);
 
         for (const num of sequence) {
             displayText.textContent = num;
-            await sleep(600); // Time number is visible
+            await sleep(600);
             displayText.textContent = '';
-            await sleep(200); // Time between numbers
+            await sleep(200);
         }
 
         displayText.textContent = '؟';
@@ -54,8 +72,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const handleCorrectAnswer = () => {
         level++;
-        if (level > highScore) {
-            highScore = level -1; // Update high score to the last completed level
+        if (level-1 > highScore) { // Update high score for the level just completed
+            highScore = level - 1;
             localStorage.setItem('sequenceHighScore', highScore);
         }
         messageDisplay.textContent = 'عالی بود! میریم مرحله بعد...';
@@ -69,31 +87,42 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 1500);
     };
 
+    // This function is heavily modified
     const handleWrongAnswer = () => {
-        messageDisplay.textContent = `اشتباه بود! دنباله صحیح: ${sequence.join('')}`;
+        lives--;
+        updateLivesUI();
         messageDisplay.className = 'message wrong';
-        level = 1;
-        
-        // Let the user see the message, then reset
-        setTimeout(() => {
-            messageDisplay.textContent = '';
-            messageDisplay.className = 'message';
-            displayText.textContent = 'دوباره تلاش کن!';
+
+        if (lives > 0) {
+            messageDisplay.textContent = `اشتباه بود! ${lives} جان دیگر باقیست.`;
+            // Let the player try the same level again
+            setTimeout(() => {
+                messageDisplay.textContent = 'دوباره به دنباله دقت کن...';
+                messageDisplay.className = 'message';
+                displaySequence(); // Re-display the same sequence
+            }, 2000);
+        } else {
+            // Game Over
+            messageDisplay.textContent = `بازی تمام شد! دنباله صحیح: ${sequence.join('')}`;
+            displayText.textContent = 'GAME OVER';
+            level = 1;
+            lives = 3;
             startBtn.disabled = false;
             startBtn.textContent = 'شروع مجدد';
-        }, 3000);
+        }
     };
 
     const checkAnswer = () => {
         const userAnswer = sequenceInput.value;
+        sequenceInput.disabled = true;
+        submitBtn.disabled = true;
+        
         if (userAnswer === sequence.join('')) {
             handleCorrectAnswer();
         } else {
             handleWrongAnswer();
         }
         sequenceInput.value = '';
-        sequenceInput.disabled = true;
-        submitBtn.disabled = true;
     };
     
     const startRound = () => {
@@ -101,8 +130,12 @@ document.addEventListener('DOMContentLoaded', () => {
         displaySequence();
     };
 
+    // Modified to reset lives on new game
     const startGame = () => {
         level = 1;
+        lives = 3; 
+        messageDisplay.textContent = '';
+        messageDisplay.className = 'message';
         updateUI();
         startBtn.textContent = 'شروع';
         startRound();

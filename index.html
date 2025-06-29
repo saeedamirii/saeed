@@ -1,1 +1,54 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بازی کلمات گمشده</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="game-container">
+
+        <div id="start-view" class="view active">
+            <h1 class="game-title">کلمات گمشده</h1>
+            <p class="game-description">در هر مرحله، کلمات یک موضوع جدید را به خاطر بسپار!</p>
+            <div class="highscore-box">
+                <span>بالاترین مرحله: </span>
+                <span id="highscore-display">۱</span>
+            </div>
+            <button id="start-game-btn" class="start-btn">شروع بازی</button>
+        </div>
+
+        <div id="memorize-view" class="view">
+            <div class="game-stats">
+                <span>مرحله: <span id="level-display">۱</span></span>
+                <span>جان اضافه: <span id="lives-display">۰</span> ❤️</span>
+            </div>
+            <div id="timer-display" class="timer"></div>
+            <h2 id="theme-display">موضوع: میوه‌ها</h2>
+            <div id="word-list" class="word-list-box"></div>
+        </div>
+
+        <div id="recall-view" class="view">
+            <h2>کلماتی که یادت میاد رو بنویس:</h2>
+            <p class="game-description">(هر کلمه در یک خط جدید)</p>
+            <textarea id="recall-input" rows="10" placeholder="اینجا تایپ کن..."></textarea>
+            <button id="submit-words-btn" class="start-btn">بررسی نتایج</button>
+        </div>
+
+        <div id="game-over-view" class="view">
+            <h1 class="game-over-title">باختی!</h1>
+            <p class="game-description">شما تا مرحله <span id="final-level-display"></span> پیش رفتی.</p>
+            <button id="play-again-btn" class="start-btn">بازی مجدد</button>
+        </div>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
 

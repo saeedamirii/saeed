@@ -1,34 +1,36 @@
 function initMemoryGame() {
     const view = $('#memory-game-view');
-    // Inject HTML content
     view.html(`
         <button class="back-btn" data-target="game-selection-view">➡️</button>
         <div class="game-container">
-            <div id="mem-game-header">
-                <h3>بازی حافظه</h3>
+            <div id="loading-overlay" class="hidden"></div>
+            <div id="mem-overlay" style="display: none;">
+                <div id="mem-modal-content"></div>
+            </div>
+            <header id="mem-game-header">
+                 <div id="mem-header-buttons-left">
+                    <button id="mem-music-toggle-button" title="پخش موزیک">🎵</button>
+                </div>
+                <div id="mem-logo">بازی حافظه</div>
                 <div id="mem-game-stats">
                     <span id="mem-moves-display">حرکت‌ها: ۰</span>
                     <span id="mem-time-display">زمان: ۰۰:۰۰</span>
                 </div>
-            </div>
-            <main>
-                <table id="mem-game-board" cellspacing="0"></table>
-            </main>
-            <div id="mem-overlay">
-                 <div id="mem-modal-content"></div>
-            </div>
+            </header>
+            <main><table id="mem-game-board" cellspacing="0"></table></main>
+            <audio id="mem-background-music" src="sound/sound.mp3" loop preload="auto"></audio>
         </div>
     `);
 
-    const em = ["💐","🌹","🌻","🏵️","🌺","🌴","🌈","🍓","🍒","🍎","🍉","🍊","🥭","🍍","🍋","🍏","🍐","🥝","🍇","🥥"];
+    // Scoped variables
+    const em = ["💐","🌹","🌻","🏵️","🌺","🌴","🌈","🍓","🍒","🍎","🍉","🍊","🥭","🍍","🍋","🍏","🍐","🥝","🍇","🥥","🍅","🌶️","🍄","🧅","🥦","🥑","🍔","🍕","🧁","🎂","🍬","🍩","🍫","🎈"];
     let firstCard, secondCard, lockBoard, moves, matchesFound, totalPairs, timerInterval;
+    const gameBoard = view.find('#mem-game-board'), modalContent = view.find('#mem-modal-content'),
+          overlay = view.find('#mem-overlay'), backgroundMusic = view.find('#mem-background-music')[0];
 
-    function formatTime(totalSeconds) {
-        const m = Math.floor(totalSeconds / 60);
-        const s = totalSeconds % 60;
-        return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-    }
-
+    // --- Core Functions ---
+    const formatTime = (s) => `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
+    
     function startTimer() {
         if (timerInterval) clearInterval(timerInterval);
         let seconds = 0;
@@ -40,24 +42,15 @@ function initMemoryGame() {
     }
     
     function createBoard(rows, cols) {
-        const gameBoard = view.find('#mem-game-board').empty();
+        gameBoard.empty().removeClass('pattern-board').addClass('memory-board').attr('data-cols', cols);
         totalPairs = (rows * cols) / 2;
-        
         let emojis = [...em].sort(() => 0.5 - Math.random()).slice(0, totalPairs);
         let cards = [...emojis, ...emojis].sort(() => 0.5 - Math.random());
-        
         for (let i = 0; i < rows; i++) {
             const tr = $('<tr></tr>');
             for (let j = 0; j < cols; j++) {
                 const emoji = cards.pop();
-                tr.append(`
-                    <td>
-                        <div class="card-inner" data-emoji="${emoji}">
-                            <div class="card-front"></div>
-                            <div class="card-back"><p>${emoji}</p></div>
-                        </div>
-                    </td>
-                `);
+                tr.append(`<td><div class="card-inner" data-emoji="${emoji}"><div class="card-front"></div><div class="card-back"><p>${emoji}</p></div></div></td>`);
             }
             gameBoard.append(tr);
         }
@@ -68,48 +61,60 @@ function initMemoryGame() {
         $(this).addClass('is-flipped');
         if (!firstCard) { firstCard = $(this); return; }
         
-        secondCard = $(this);
-        moves++;
+        secondCard = $(this); moves++;
         view.find('#mem-moves-display').text(`حرکت‌ها: ${moves}`);
         lockBoard = true;
 
         if (firstCard.data('emoji') === secondCard.data('emoji')) {
             matchesFound++;
-            firstCard.addClass('is-matched');
-            secondCard.addClass('is-matched');
+            firstCard.addClass('is-matched'); secondCard.addClass('is-matched');
             resetTurn();
             if (matchesFound === totalPairs) {
                 clearInterval(timerInterval);
-                setTimeout(() => alert('شما در بازی حافظه برنده شدید!'), 500);
+                setTimeout(() => showModal(true), 500);
             }
         } else {
-            setTimeout(() => {
-                firstCard.removeClass('is-flipped');
-                secondCard.removeClass('is-flipped');
-                resetTurn();
-            }, 1200);
+            setTimeout(() => { firstCard.removeClass('is-flipped'); secondCard.removeClass('is-flipped'); resetTurn(); }, 1200);
         }
     }
 
-    function resetTurn() {
-        [firstCard, secondCard, lockBoard] = [null, null, false];
-    }
+    function resetTurn() { [firstCard, secondCard, lockBoard] = [null, null, false]; }
     
-    function startGame(rows, cols){
-        moves = 0;
-        matchesFound = 0;
+    function showModal(isWin = false) {
+        let content = `<h2>یک حالت را انتخاب کنید</h2><div id="mem-mode-selection">`;
+        if (isWin) { content = `<h2>شما برنده شدید!</h2><p>دوباره بازی می‌کنید؟</p><div id="mem-mode-selection">`; }
+        content += `<button data-mode="4x4">4x4</button><button data-mode="5x6">5x6</button><button data-mode="6x6">6x6</button></div>`;
+        modalContent.html(content);
+        overlay.css('display', 'flex');
+    }
+
+    function startGame(rows, cols) {
+        moves = 0; matchesFound = 0;
         view.find('#mem-moves-display').text(`حرکت‌ها: ۰`);
+        overlay.hide();
         createBoard(rows, cols);
         startTimer();
     }
     
+    // --- Event Listeners ---
     view.on('click', '.card-inner', handleCardClick);
-    startGame(4, 4); // Start with a 4x4 board
+    view.on('click', '#mem-music-toggle-button', function() {
+        if(backgroundMusic.paused) backgroundMusic.play();
+        else backgroundMusic.pause();
+        $(this).text(backgroundMusic.paused ? '🎵' : '⏸️');
+    });
+    view.on('click', '#mem-mode-selection button', function() {
+        const [rows, cols] = $(this).data('mode').split('x').map(Number);
+        startGame(rows, cols);
+    });
+    
+    // --- Initial Call ---
+    showModal();
 
     return function cleanup() {
         clearInterval(timerInterval);
-        view.off('click', '.card-inner');
+        backgroundMusic.pause();
+        view.off();
         view.empty();
     };
 }
-

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>بازی دنباله سریع</title>
+    <title>بازی کلمات گمشده</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700&display=swap" rel="stylesheet">
@@ -12,59 +12,77 @@
 <body>
 
     <div id="game-container">
+        
         <details class="game-guide">
             <summary>راهنمای بازی</summary>
             <p>
-                دنباله اعداد را به خاطر بسپار و آن را تکرار کن.
+                باید <strong>تمام</strong> کلمات نمایش داده شده را به خاطر بسپاری و تکرار کنی.
                 <br>
-                - ۵ فرصت راهنمای خودکار برای نمایش ارقام غلط داری.
+                - با یادآوری تمام کلمات در هر مرحله، یک <strong>جان اضافه</strong> ❤️ می‌گیری.
                 <br>
-                - بعد از اتمام راهنما، با هر اشتباه یک جان از دست می‌دهی.
+                - در صورت شکست در یک مرحله، از جان‌های اضافه برای تلاش مجدد استفاده می‌شود.
+                <br>
+                - در کل بازی <strong>۵ فرصت راهنما (💡)</strong> داری تا یکی از کلمات را به یادت بیاورد.
                 <br>
                 <strong>مدال‌ها:</strong>
                 🥉مرحله ۵, 🥈مرحله ۱۰, 🥇مرحله ۱۵, 💎مرحله ۲۰
             </p>
         </details>
 
-        <header class="game-header">
+        <div id="start-view" class="view active">
             <div id="medals-container">
                 <span id="medal-bronze" class="medal" title="رسیدن به مرحله ۵">🥉</span>
                 <span id="medal-silver" class="medal" title="رسیدن به مرحله ۱۰">🥈</span>
                 <span id="medal-gold" class="medal" title="رسیدن به مرحله ۱۵">🥇</span>
                 <span id="medal-master" class="medal" title="رسیدن به مرحله ۲۰">💎</span>
             </div>
-            <h1>دنباله سریع</h1>
-            <div class="game-info">
-                <span>مرحله: <span id="level-display">1</span></span>
-                <div id="lives-display" class="lives"></div>
-                <span>بالاترین امتیاز: <span id="highscore-display">0</span></span>
+            <h1 class="game-title">کلمات گمشده</h1>
+            <div class="highscore-box">
+                <span>بالاترین مرحله: </span>
+                <span id="highscore-display">۱</span>
             </div>
-            <div id="hint-display-container">
-                <span id="hint-count">5</span>
-                <span>فرصت راهنما</span>
-            </div>
-        </header>
+            <button id="start-game-btn" class="start-btn">شروع بازی</button>
+        </div>
 
-        <main>
-            <div id="sequence-display" class="display-box">
-                <p id="display-text">برای شروع، دکمه "شروع" را بزن</p>
+        <div id="memorize-view" class="view">
+            <div class="game-stats">
+                <span>مرحله: <span id="level-display">۱</span></span>
+                <span>جان اضافه: <span id="lives-display">۰</span> ❤️</span>
             </div>
+            <div id="timer-display" class="timer"></div>
+            <h2 id="theme-display"></h2>
+            <div id="word-list" class="word-list-box"></div>
+        </div>
 
-            <div id="message-display" class="message"></div>
-
-            <div class="input-wrapper">
-                <div id="fake-input" class="input-display" dir="ltr"></div>
-                <input type="text" id="sequence-input" autocomplete="off" />
+        <div id="recall-view" class="view">
+            <div class="recall-header">
+                <h2>کلماتی که یادت میاد رو بنویس:</h2>
+                <button id="hint-btn">💡 راهنما (<span id="hint-count">5</span>)</button>
             </div>
-
-            <div class="button-group">
-                <button id="sequence-submit-btn" disabled>تایید</button>
-            </div>
-        </main>
+            <textarea id="recall-input" rows="10" placeholder="هر کلمه در یک خط جدید..."></textarea>
+            <button id="submit-words-btn" class="start-btn">بررسی نتایج</button>
+        </div>
         
-        <footer>
-            <button id="start-sequence-btn" class="start-btn">شروع</button>
-        </footer>
+        <div id="level-complete-view" class="view">
+            <h1 class="level-complete-title">ایول! بریم مرحله بعدی</h1>
+        </div>
+
+        <div id="game-over-view" class="view">
+            <h1 class="game-over-title">باختی!</h1>
+            <p class="game-description">شما در مرحله <span id="final-level-display"></span> شکست خوردی.</p>
+            <div class="results-columns">
+                <div class="column">
+                    <h3>✅ درست</h3>
+                    <ul id="correct-words-list"></ul>
+                </div>
+                <div class="column">
+                    <h3>❌ فراموش شده</h3>
+                    <ul id="missed-words-list"></ul>
+                </div>
+            </div>
+            <button id="play-again-btn" class="start-btn">بازی مجدد</button>
+        </div>
+
     </div>
 
     <script src="script.js"></script>

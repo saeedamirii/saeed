@@ -50,15 +50,16 @@ document.addEventListener('DOMContentLoaded', () => {
     let achievements = JSON.parse(localStorage.getItem('wordGameAchievements')) || { bronze: false, silver: false, gold: false, master: false };
 
     // =================================================================
-    // ### تابع جدید و کلیدی استانداردسازی ###
+    // ### تابع استانداردسازی دقیق‌تر شده است ###
     // =================================================================
     const normalizeWord = (word) => {
         if (!word) return '';
         return word
-            .trim() // حذف فاصله‌های اضافی از ابتدا و انتها
-            .replace(/ي/g, 'ی') // تبدیل 'ي' عربی به 'ی' فارسی
-            .replace(/ك/g, 'ک') // تبدیل 'ك' عربی به 'ک' فارسی
-            .replace(/\s/g, ''); // حذف تمام فاصله‌های داخلی (برای کلمات چند بخشی)
+            .trim()
+            .replace(/ي|ئ/g, 'ی') // تبدیل 'ي' و 'ئ' به 'ی' فارسی
+            .replace(/ك/g, 'ک')   // تبدیل 'ك' عربی به 'ک' فارسی
+            .replace(/آ/g, 'ا')    // تبدیل 'آ' به 'ا'
+            .replace(/\s/g, '');  // حذف تمام فاصله‌های داخلی
     };
 
     // --- Functions ---
@@ -131,13 +132,10 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const checkResults = () => {
-        // استانداردسازی کلمات کاربر قبل از مقایسه
         const userWords = new Set(recallInput.value.trim().split('\n').filter(Boolean).map(normalizeWord));
-        // استانداردسازی کلمات اصلی برای مقایسه
-        const normalizedOriginalWords = new Set(wordsToMemorize.map(normalizeWord));
+        const allCorrect = wordsToMemorize.length === userWords.size && wordsToMemorize.every(word => userWords.has(normalizeWord(word)));
 
-        if (userWords.size === wordsToMemorize.length && wordsToMemorize.every(word => userWords.has(normalizeWord(word)))) {
-            // --- Passed the level ---
+        if (allCorrect) {
             extraLives++;
             checkAndUnlockMedal();
             level++;
@@ -148,12 +146,10 @@ document.addEventListener('DOMContentLoaded', () => {
             showView('levelComplete');
             setTimeout(() => startRound(), 1500);
         } else {
-            // --- Failed the level ---
             if (extraLives > 0) {
                 extraLives--;
                 startRound();
             } else {
-                // Game Over
                 finalLevelDisplay.textContent = level;
                 const correctWords = wordsToMemorize.filter(word => userWords.has(normalizeWord(word)));
                 const missedWords = wordsToMemorize.filter(word => !userWords.has(normalizeWord(word)));
@@ -185,7 +181,6 @@ document.addEventListener('DOMContentLoaded', () => {
         showView('start');
     };
 
-    // Event Listeners
     startGameBtn.addEventListener('click', () => {
         level = 1;
         extraLives = 0;
@@ -196,7 +191,5 @@ document.addEventListener('DOMContentLoaded', () => {
     playAgainBtn.addEventListener('click', initializeGame);
     hintBtn.addEventListener('click', useHint);
 
-    // Initial Load
     initializeGame();
 });
-            

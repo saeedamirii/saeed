@@ -1,92 +1,128 @@
 <!DOCTYPE html>
 <html lang="fa">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>اپ بازی‌های حافظه</title>
   <style>
     * {
-      box-sizing: border-box;
       margin: 0;
       padding: 0;
+      box-sizing: border-box;
+      font-family: "Vazir", sans-serif;
+    }
+
+    body, html {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
     }
 
     body {
-      font-family: "Vazir", sans-serif;
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      color: #fff;
-      overflow-x: hidden;
+      background: linear-gradient(135deg, #2c3e50, #4ca1af);
+      position: relative;
     }
 
-    header {
-      margin-bottom: 30px;
-      transition: all 0.5s ease;
+    /* انیمیشن گرادینت پس‌زمینه */
+    body::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(270deg, #ff512f, #dd2476, #24c6dc, #514a9d);
+      background-size: 800% 800%;
+      animation: gradientBG 20s ease infinite;
+      opacity: 0.3;
+      z-index: 0;
     }
 
-    header.hidden {
-      opacity: 0;
-      transform: translateY(-50px);
-      pointer-events: none;
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
     }
 
-    h1 {
-      font-size: 50px;
-      text-shadow: 2px 2px 10px rgba(0,0,0,0.6);
+    .overlay {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.4);
+      z-index: 1;
     }
 
     .menu {
+      position: relative;
+      z-index: 2;
       display: flex;
-      flex-wrap: wrap;
+      flex-direction: column;
       justify-content: center;
-      gap: 20px;
-      transition: opacity 0.5s ease;
+      align-items: center;
+      height: 100%;
+      text-align: center;
+      padding: 20px;
+      animation: fadeIn 1.5s ease forwards;
     }
 
-    .menu.hidden {
-      opacity: 0;
-      pointer-events: none;
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .menu h1 {
+      font-size: 50px;
+      margin-bottom: 30px;
+      color: #ffffff;
+      text-shadow: 0 0 20px rgba(255,255,255,0.7);
     }
 
     .menu button {
-      background: linear-gradient(45deg, #ff9800, #ff5722);
+      background: linear-gradient(45deg, #ff512f, #dd2476);
       border: none;
       border-radius: 12px;
       color: #fff;
-      font-size: 24px;
-      padding: 20px 40px;
+      font-size: 26px;
+      padding: 20px 60px;
+      margin: 15px;
       cursor: pointer;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-      transition: transform 0.3s, box-shadow 0.3s;
+      box-shadow: 0 0 30px rgba(221, 36, 118, 0.6);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .menu button::before {
+      content: "";
+      position: absolute;
+      top: 0; left: -100%;
+      width: 200%;
+      height: 100%;
+      background: linear-gradient(120deg, rgba(255,255,255,0.3), transparent, rgba(255,255,255,0.3));
+      transform: skewX(-20deg);
+      transition: left 0.5s ease;
+    }
+
+    .menu button:hover::before {
+      left: 100%;
     }
 
     .menu button:hover {
-      transform: translateY(-5px) scale(1.05);
-      box-shadow: 0 12px 24px rgba(0,0,0,0.4);
+      transform: scale(1.05);
+      box-shadow: 0 0 50px rgba(221, 36, 118, 0.8);
     }
 
     #game-container {
       display: none;
-      width: 100%;
-      max-width: 1000px;
       flex-direction: column;
       align-items: center;
-      animation: fadeIn 0.5s ease forwards;
-    }
-
-    iframe {
-      width: 100%;
-      height: 600px;
-      border: none;
-      border-radius: 15px;
-      box-shadow: 0 0 25px rgba(0,0,0,0.5);
+      justify-content: center;
+      height: 100%;
+      z-index: 2;
+      animation: fadeIn 0.8s ease forwards;
     }
 
     .back-btn {
-      background: linear-gradient(45deg, #e91e63, #c2185b);
+      background: linear-gradient(45deg, #24c6dc, #514a9d);
       border: none;
       border-radius: 8px;
       color: #fff;
@@ -94,30 +130,32 @@
       padding: 12px 30px;
       cursor: pointer;
       margin-bottom: 20px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+      box-shadow: 0 0 20px rgba(36, 198, 220, 0.6);
       transition: transform 0.3s, box-shadow 0.3s;
     }
 
     .back-btn:hover {
       transform: translateY(-3px) scale(1.05);
-      box-shadow: 0 12px 24px rgba(0,0,0,0.5);
+      box-shadow: 0 0 40px rgba(36, 198, 220, 0.8);
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: scale(0.9); }
-      to { opacity: 1; transform: scale(1); }
+    iframe {
+      width: 90%;
+      height: 600px;
+      border: none;
+      border-radius: 15px;
+      box-shadow: 0 0 30px rgba(0,0,0,0.7);
     }
   </style>
 </head>
 <body>
-  <header id="header">
-    <h1>اپ بازی‌های حافظه</h1>
-  </header>
+  <div class="overlay"></div>
 
   <div class="menu" id="main-menu">
-    <button onclick="openGame('game1/index.html')">بازی ۱</button>
-    <button onclick="openGame('game2/index.html')">بازی ۲</button>
-    <button onclick="openGame('game3/index.html')">بازی ۳</button>
+    <h1>بازی‌های حافظه</h1>
+    <button onclick="openGame('game1/index.html')">چالش الگو و کارت‌ها</button>
+    <button onclick="openGame('game2/index.html')">دنباله سریع</button>
+    <button onclick="openGame('game3/index.html')">کلمات گمشده</button>
   </div>
 
   <div id="game-container">
@@ -127,16 +165,14 @@
 
   <script>
     function openGame(url) {
-      document.getElementById('header').classList.add('hidden');
-      document.getElementById('main-menu').classList.add('hidden');
+      document.getElementById('main-menu').style.display = 'none';
       document.getElementById('game-container').style.display = 'flex';
       document.getElementById('game-frame').src = url;
     }
 
     function backToMenu() {
       document.getElementById('game-container').style.display = 'none';
-      document.getElementById('main-menu').classList.remove('hidden');
-      document.getElementById('header').classList.remove('hidden');
+      document.getElementById('main-menu').style.display = 'flex';
       document.getElementById('game-frame').src = "";
     }
   </script>

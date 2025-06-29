@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نبرد ذهن</title>
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="app-container">
+
+        <div id="main-menu-view" class="view active">
+            <h1 id="main-logo">نبرد ذهن</h1>
+            <p class="app-subtitle">مجموعه بازی‌های تقویت حافظه</p>
+            <div class="menu-buttons">
+                <button class="nav-btn" data-target="game-selection-view">شروع</button>
+                <button class="nav-btn" disabled>پروفایل (به زودی)</button>
+            </div>
+        </div>
+
+        <div id="game-selection-view" class="view hidden">
+            <button class="back-btn" data-target="main-menu-view">➡️</button>
+            <h2>یک بازی انتخاب کن</h2>
+            <div class="game-list">
+                <div class="game-card nav-btn" data-target="memory-game-view" data-init="initMemoryGame">
+                    <h3>بازی حافظه</h3>
+                    <p>جفت کارت‌های مشابه را پیدا کن.</p>
+                </div>
+                <div class="game-card nav-btn" data-target="sequence-game-view" data-init="initSequenceGame">
+                    <h3>دنباله سریع</h3>
+                    <p>سرعت و حافظه کوتاه‌مدت خود را به چالش بکش.</p>
+                </div>
+                <div class="game-card nav-btn" data-target="words-game-view" data-init="initWordRecallGame">
+                    <h3>کلمات گمشده</h3>
+                    <p>توانایی به خاطر سپردن کلمات را آزمایش کن.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="memory-game-view" class="view hidden game-wrapper"></div>
+        <div id="sequence-game-view" class="view hidden game-wrapper"></div>
+        <div id="words-game-view" class="view hidden game-wrapper"></div>
+
+    </div>
+    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/game_memory.js"></script>
+    <script src="js/game_sequence.js"></script>
+    <script src="js/game_words.js"></script>
+</body>
+</html>

@@ -78,9 +78,10 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 .game-card h3 { font-size: 1.5rem; margin-bottom: 0.5rem; color: var(--primary-accent) }
 .game-card p { opacity: 0.8; }
 
-.game-wrapper { padding-top: 4rem; }
+.game-wrapper { padding-top: 4.5rem; }
 .game-wrapper .back-btn { top: 1rem; right: 1rem; }
-.game-container { font-family: 'Vazirmatn', sans-serif; text-align: center; }
+.game-container { font-family: 'Vazirmatn', sans-serif; text-align: center; height:100%; display:flex; flex-direction: column;}
+main { flex-grow: 1; display: flex; align-items: center; justify-content: center; }
 
 /* ============================ */
 /* ===== COMMON GAME CSS ====== */
@@ -102,7 +103,11 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 /* ============================ */
 /* ===== MEMORY GAME CSS ====== */
 /* ============================ */
-#memory-game-view #game-board { border-spacing: 5px; margin: auto; }
+#memory-game-view #mem-game-header { flex-direction: column; gap: 10px; padding: 0.5rem; background: rgba(0,0,0,0.15); border-radius: 8px; margin-bottom:1rem; }
+#memory-game-view #mem-logo { font-size: 1.5em; font-weight: 700; color: var(--primary-accent); }
+#memory-game-view #mem-game-stats { display: flex; gap: 15px; font-size: 1em; width: 100%; justify-content: space-around;}
+#memory-game-view #mem-moves-display, #memory-game-view #mem-time-display { background-color: rgba(0,0,0,0.2); padding: 8px 12px; border-radius: 8px; }
+#memory-game-view #mem-game-board { border-spacing: 5px; margin: auto; }
 #memory-game-view td { width: 65px; height: 65px; perspective: 1000px; }
 #memory-game-view .card-inner { width: 100%; height: 100%; cursor: pointer; border-radius: 10px; position: relative; transform-style: preserve-3d; transition: transform 0.7s; }
 #memory-game-view .card-inner.is-flipped { transform: rotateY(180deg); }
@@ -111,7 +116,10 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 #memory-game-view .card-front { background: linear-gradient(135deg, #00d9ff, #007cf0); }
 #memory-game-view .card-back { background-color: #e0e0e0; transform: rotateY(180deg); }
 #memory-game-view .card-back p { font-size: 2.2em; color: #141928; }
-#memory-game-view #modal-content h2 { color: var(--primary-accent); }
+#memory-game-view #mem-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.85); display: none; align-items: center; justify-content: center; z-index: 1000; }
+#memory-game-view #mem-modal-content { background: var(--container-bg); padding: 25px 30px; border-radius: 10px; text-align: center; max-width: 450px; }
+#memory-game-view #mem-modal-content h2 { font-size: 1.8em; color: var(--primary-accent); margin-bottom: 15px; }
+#memory-game-view #mem-modal-content button { background: var(--primary-accent); color: var(--bg-color); border:none; border-radius:8px; padding: 10px 20px; margin: 5px; cursor:pointer;}
 
 /* =============================== */
 /* ===== SEQUENCE GAME CSS ====== */
@@ -145,4 +153,4 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 #words-game-view .column ul { list-style-type: none; padding: 0; }
 #words-game-view #wr-correct-words-list li { color: var(--success-color); }
 #words-game-view #wr-missed-words-list li { color: var(--error-color); }
-
+                                 

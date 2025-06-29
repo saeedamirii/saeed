@@ -11,29 +11,24 @@
       font-family: "Vazir", sans-serif;
     }
 
-    body, html {
+    html, body {
       width: 100%;
       height: 100%;
       overflow: hidden;
+      background: #111;
     }
 
-    body {
-      background: linear-gradient(135deg, #2c3e50, #4ca1af);
-      position: relative;
-    }
-
-    /* انیمیشن گرادینت پس‌زمینه */
     body::before {
       content: "";
-      position: absolute;
+      position: fixed;
       top: 0; left: 0;
       width: 100%;
       height: 100%;
-      background: linear-gradient(270deg, #ff512f, #dd2476, #24c6dc, #514a9d);
+      background: linear-gradient(270deg, #ff416c, #ff4b2b, #1e90ff, #00bcd4);
       background-size: 800% 800%;
-      animation: gradientBG 20s ease infinite;
-      opacity: 0.3;
-      z-index: 0;
+      animation: gradientBG 15s ease infinite;
+      z-index: -1;
+      opacity: 0.6;
     }
 
     @keyframes gradientBG {
@@ -42,56 +37,50 @@
       100% { background-position: 0% 50%; }
     }
 
-    .overlay {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.4);
-      z-index: 1;
-    }
-
-    .menu {
-      position: relative;
-      z-index: 2;
+    .menu, #game-container {
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
       height: 100%;
-      text-align: center;
       padding: 20px;
-      animation: fadeIn 1.5s ease forwards;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: scale(0.9); }
-      to { opacity: 1; transform: scale(1); }
+      text-align: center;
     }
 
     .menu h1 {
-      font-size: 50px;
-      margin-bottom: 30px;
-      color: #ffffff;
-      text-shadow: 0 0 20px rgba(255,255,255,0.7);
+      font-size: 48px;
+      margin-bottom: 40px;
+      color: #fff;
+      text-shadow: 0 0 30px rgba(255, 255, 255, 0.8);
     }
 
-    .menu button {
-      background: linear-gradient(45deg, #ff512f, #dd2476);
+    .menu button,
+    .back-btn,
+    .exit-btn {
+      background: linear-gradient(45deg, #00f2fe, #4facfe);
       border: none;
-      border-radius: 12px;
+      border-radius: 15px;
       color: #fff;
-      font-size: 26px;
+      font-size: 24px;
       padding: 20px 60px;
       margin: 15px;
       cursor: pointer;
-      box-shadow: 0 0 30px rgba(221, 36, 118, 0.6);
-      transition: all 0.3s ease;
+      box-shadow: 0 0 40px rgba(0, 242, 254, 0.6);
       position: relative;
       overflow: hidden;
+      transition: all 0.3s ease;
     }
 
-    .menu button::before {
+    .menu button:hover,
+    .back-btn:hover,
+    .exit-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 60px rgba(0, 242, 254, 0.9);
+    }
+
+    .menu button::before,
+    .back-btn::before,
+    .exit-btn::before {
       content: "";
       position: absolute;
       top: 0; left: -100%;
@@ -102,63 +91,32 @@
       transition: left 0.5s ease;
     }
 
-    .menu button:hover::before {
+    .menu button:hover::before,
+    .back-btn:hover::before,
+    .exit-btn:hover::before {
       left: 100%;
-    }
-
-    .menu button:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 50px rgba(221, 36, 118, 0.8);
-    }
-
-    #game-container {
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100%;
-      z-index: 2;
-      animation: fadeIn 0.8s ease forwards;
-    }
-
-    .back-btn {
-      background: linear-gradient(45deg, #24c6dc, #514a9d);
-      border: none;
-      border-radius: 8px;
-      color: #fff;
-      font-size: 20px;
-      padding: 12px 30px;
-      cursor: pointer;
-      margin-bottom: 20px;
-      box-shadow: 0 0 20px rgba(36, 198, 220, 0.6);
-      transition: transform 0.3s, box-shadow 0.3s;
-    }
-
-    .back-btn:hover {
-      transform: translateY(-3px) scale(1.05);
-      box-shadow: 0 0 40px rgba(36, 198, 220, 0.8);
     }
 
     iframe {
       width: 90%;
       height: 600px;
       border: none;
-      border-radius: 15px;
+      border-radius: 20px;
       box-shadow: 0 0 30px rgba(0,0,0,0.7);
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
-  <div class="overlay"></div>
-
   <div class="menu" id="main-menu">
     <h1>بازی‌های حافظه</h1>
     <button onclick="openGame('game1/index.html')">چالش الگو و کارت‌ها</button>
     <button onclick="openGame('game2/index.html')">دنباله سریع</button>
     <button onclick="openGame('game3/index.html')">کلمات گمشده</button>
+    <button class="exit-btn" onclick="exitApp()">خروج از بازی</button>
   </div>
 
-  <div id="game-container">
+  <div id="game-container" style="display: none;">
     <button class="back-btn" onclick="backToMenu()">بازگشت به منو</button>
     <iframe id="game-frame"></iframe>
   </div>
@@ -171,9 +129,17 @@
     }
 
     function backToMenu() {
+      document.getElementById('game-frame').src = "";
       document.getElementById('game-container').style.display = 'none';
       document.getElementById('main-menu').style.display = 'flex';
-      document.getElementById('game-frame').src = "";
+    }
+
+    function exitApp() {
+      // اگر اپلیکیشن هست (مثلاً Cordova یا Webview) می‌تونی exit بزنی
+      // توی وب اینکارو می‌کنیم:
+      window.close();
+      // اگر window.close کار نکرد (بعضی مرورگرها نمیذارن)، می‌تونی مثلا ری‌دایرکت کنی:
+      window.location.href = "https://google.com"; // یا صفحه دلخواهت
     }
   </script>
 </body>

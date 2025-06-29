@@ -43,11 +43,23 @@ document.addEventListener('DOMContentLoaded', () => {
         "غذاها": ["پیتزا", "همبرگر", "ماکارونی", "کباب", "قرمه سبزی", "جوجه", "سوپ", "سالاد", "برنج", "نان", "تخم مرغ", "پنیر", "ماست", "کره", "عسل"]
     };
     const themes = Object.keys(wordBank);
-    const allWords = Object.values(wordBank).flat(); // All words in one array for mixed rounds
+    const allWords = Object.values(wordBank).flat();
 
     // --- Game State ---
     let level, extraLives, hintsLeft, highScore, timer, wordsToMemorize, currentTheme;
     let achievements = JSON.parse(localStorage.getItem('wordGameAchievements')) || { bronze: false, silver: false, gold: false, master: false };
+
+    // =================================================================
+    // ### تابع جدید و کلیدی استانداردسازی ###
+    // =================================================================
+    const normalizeWord = (word) => {
+        if (!word) return '';
+        return word
+            .trim() // حذف فاصله‌های اضافی از ابتدا و انتها
+            .replace(/ي/g, 'ی') // تبدیل 'ي' عربی به 'ی' فارسی
+            .replace(/ك/g, 'ک') // تبدیل 'ك' عربی به 'ک' فارسی
+            .replace(/\s/g, ''); // حذف تمام فاصله‌های داخلی (برای کلمات چند بخشی)
+    };
 
     // --- Functions ---
     const showView = (viewName) => {
@@ -99,10 +111,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const startRound = () => {
         updateUI();
         recallInput.value = '';
-        const wordsCount = Math.min(4 + level, 12); // Difficulty scaling for word count
-        const timeToMemorize = Math.max(10, 30 - level); // Difficulty scaling for time
+        const wordsCount = Math.min(4 + level, 12);
+        const timeToMemorize = Math.max(10, 30 - level);
         
-        // --- New Logic: Themed vs. Mixed Rounds ---
         if (level > 10) {
             currentTheme = "ترکیبی 🤯";
             const shuffled = [...new Set(allWords)].sort(() => 0.5 - Math.random());
@@ -120,8 +131,13 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const checkResults = () => {
-        const userWords = new Set(recallInput.value.trim().split('\n').filter(Boolean));
-        if (userWords.size === wordsToMemorize.length && wordsToMemorize.every(word => userWords.has(word))) {
+        // استانداردسازی کلمات کاربر قبل از مقایسه
+        const userWords = new Set(recallInput.value.trim().split('\n').filter(Boolean).map(normalizeWord));
+        // استانداردسازی کلمات اصلی برای مقایسه
+        const normalizedOriginalWords = new Set(wordsToMemorize.map(normalizeWord));
+
+        if (userWords.size === wordsToMemorize.length && wordsToMemorize.every(word => userWords.has(normalizeWord(word)))) {
+            // --- Passed the level ---
             extraLives++;
             checkAndUnlockMedal();
             level++;
@@ -132,13 +148,15 @@ document.addEventListener('DOMContentLoaded', () => {
             showView('levelComplete');
             setTimeout(() => startRound(), 1500);
         } else {
+            // --- Failed the level ---
             if (extraLives > 0) {
                 extraLives--;
                 startRound();
             } else {
+                // Game Over
                 finalLevelDisplay.textContent = level;
-                const correctWords = wordsToMemorize.filter(word => userWords.has(word));
-                const missedWords = wordsToMemorize.filter(word => !userWords.has(word));
+                const correctWords = wordsToMemorize.filter(word => userWords.has(normalizeWord(word)));
+                const missedWords = wordsToMemorize.filter(word => !userWords.has(normalizeWord(word)));
                 correctWordsList.innerHTML = correctWords.map(word => `<li>${word}</li>`).join('') || "<li>هیچکدام</li>";
                 missedWordsList.innerHTML = missedWords.map(word => `<li>${word}</li>`).join('') || "<li>هیچکدام</li>";
                 showView('gameOver');
@@ -148,8 +166,8 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const useHint = () => {
         if (hintsLeft <= 0) return;
-        const userWords = new Set(recallInput.value.trim().split('\n').filter(Boolean));
-        const unrememberedWord = wordsToMemorize.find(word => !userWords.has(word));
+        const userWords = new Set(recallInput.value.trim().split('\n').filter(Boolean).map(normalizeWord));
+        const unrememberedWord = wordsToMemorize.find(word => !userWords.has(normalizeWord(word)));
         
         if (unrememberedWord) {
             recallInput.value += (recallInput.value.length > 0 ? '\n' : '') + unrememberedWord;
@@ -167,6 +185,7 @@ document.addEventListener('DOMContentLoaded', () => {
         showView('start');
     };
 
+    // Event Listeners
     startGameBtn.addEventListener('click', () => {
         level = 1;
         extraLives = 0;
@@ -177,5 +196,7 @@ document.addEventListener('DOMContentLoaded', () => {
     playAgainBtn.addEventListener('click', initializeGame);
     hintBtn.addEventListener('click', useHint);
 
+    // Initial Load
     initializeGame();
 });
+            

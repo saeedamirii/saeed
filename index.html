@@ -1,91 +1,96 @@
 <!DOCTYPE html>
-<html lang="fa" dir="rtl">
+<html lang="fa">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>بازی کلمات گمشده</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <title>اپ بازی‌های حافظه</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Vazir", sans-serif;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: #fff;
+      text-align: center;
+    }
+    h1 {
+      margin-top: 40px;
+      font-size: 48px;
+      text-shadow: 2px 2px 4px #000;
+    }
+    .menu {
+      margin-top: 50px;
+    }
+    .menu button {
+      display: inline-block;
+      margin: 20px;
+      padding: 20px 40px;
+      font-size: 24px;
+      border: none;
+      border-radius: 10px;
+      background: #ff9800;
+      color: #fff;
+      cursor: pointer;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+      transition: transform 0.2s;
+    }
+    .menu button:hover {
+      transform: scale(1.1);
+      background: #ff5722;
+    }
+    #game-container {
+      display: none;
+      margin-top: 30px;
+      padding: 20px;
+    }
+    iframe {
+      width: 90%;
+      height: 600px;
+      border: none;
+      border-radius: 15px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    }
+    .back-btn {
+      display: inline-block;
+      margin-bottom: 20px;
+      padding: 10px 25px;
+      background: #e91e63;
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 20px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .back-btn:hover {
+      background: #c2185b;
+    }
+  </style>
 </head>
 <body>
+  <h1>اپ بازی‌های حافظه</h1>
 
-    <div id="game-container">
-        
-        <details class="game-guide">
-            <summary>راهنمای بازی</summary>
-            <p>
-                باید <strong>تمام</strong> کلمات نمایش داده شده را به خاطر بسپاری و تکرار کنی.
-                <br>
-                - با یادآوری تمام کلمات در هر مرحله، یک <strong>جان اضافه</strong> ❤️ می‌گیری.
-                <br>
-                - در صورت شکست در یک مرحله، از جان‌های اضافه برای تلاش مجدد استفاده می‌شود.
-                <br>
-                - در کل بازی <strong>۵ فرصت راهنما (💡)</strong> داری تا یکی از کلمات را به یادت بیاورد.
-                <br>
-                <strong>مدال‌ها:</strong>
-                🥉مرحله ۵, 🥈مرحله ۱۰, 🥇مرحله ۱۵, 💎مرحله ۲۰
-            </p>
-        </details>
+  <div class="menu" id="main-menu">
+    <button onclick="openGame('game1/index.html')">بازی ۱</button>
+    <button onclick="openGame('game2/index.html')">بازی ۲</button>
+    <button onclick="openGame('game3/index.html')">بازی ۳</button>
+  </div>
 
-        <div id="start-view" class="view active">
-            <div id="medals-container">
-                <span id="medal-bronze" class="medal" title="رسیدن به مرحله ۵">🥉</span>
-                <span id="medal-silver" class="medal" title="رسیدن به مرحله ۱۰">🥈</span>
-                <span id="medal-gold" class="medal" title="رسیدن به مرحله ۱۵">🥇</span>
-                <span id="medal-master" class="medal" title="رسیدن به مرحله ۲۰">💎</span>
-            </div>
-            <h1 class="game-title">کلمات گمشده</h1>
-            <div class="highscore-box">
-                <span>بالاترین مرحله: </span>
-                <span id="highscore-display">۱</span>
-            </div>
-            <button id="start-game-btn" class="start-btn">شروع بازی</button>
-        </div>
+  <div id="game-container">
+    <button class="back-btn" onclick="backToMenu()">بازگشت به منو</button>
+    <iframe id="game-frame"></iframe>
+  </div>
 
-        <div id="memorize-view" class="view">
-            <div class="game-stats">
-                <span>مرحله: <span id="level-display">۱</span></span>
-                <span>جان اضافه: <span id="lives-display">۰</span> ❤️</span>
-            </div>
-            <div id="timer-display" class="timer"></div>
-            <h2 id="theme-display"></h2>
-            <div id="word-list" class="word-list-box"></div>
-        </div>
-
-        <div id="recall-view" class="view">
-            <div class="recall-header">
-                <h2>کلماتی که یادت میاد رو بنویس:</h2>
-                <button id="hint-btn">💡 راهنما (<span id="hint-count">5</span>)</button>
-            </div>
-            <textarea id="recall-input" rows="10" placeholder="هر کلمه در یک خط جدید..."></textarea>
-            <button id="submit-words-btn" class="start-btn">بررسی نتایج</button>
-        </div>
-        
-        <div id="level-complete-view" class="view">
-            <h1 class="level-complete-title">ایول! بریم مرحله بعدی</h1>
-        </div>
-
-        <div id="game-over-view" class="view">
-            <h1 class="game-over-title">باختی!</h1>
-            <p class="game-description">شما در مرحله <span id="final-level-display"></span> شکست خوردی.</p>
-            <div class="results-columns">
-                <div class="column">
-                    <h3>✅ درست</h3>
-                    <ul id="correct-words-list"></ul>
-                </div>
-                <div class="column">
-                    <h3>❌ فراموش شده</h3>
-                    <ul id="missed-words-list"></ul>
-                </div>
-            </div>
-            <button id="play-again-btn" class="start-btn">بازی مجدد</button>
-        </div>
-
-    </div>
-
-    <script src="script.js"></script>
+  <script>
+    function openGame(url) {
+      document.getElementById('main-menu').style.display = 'none';
+      document.getElementById('game-container').style.display = 'block';
+      document.getElementById('game-frame').src = url;
+    }
+    
+    function backToMenu() {
+      document.getElementById('game-container').style.display = 'none';
+      document.getElementById('main-menu').style.display = 'block';
+      document.getElementById('game-frame').src = "";
+    }
+  </script>
 </body>
 </html>
-

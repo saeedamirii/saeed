@@ -1,1 +1,73 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بازی دنباله سریع</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="game-container">
+        <details class="game-guide">
+            <summary>راهنمای بازی</summary>
+            <p>
+                دنباله اعداد را به خاطر بسپار و آن را تکرار کن.
+                <br>
+                - ۵ فرصت راهنمای خودکار برای نمایش ارقام غلط داری.
+                <br>
+                - بعد از اتمام راهنما، با هر اشتباه یک جان از دست می‌دهی.
+                <br>
+                <strong>مدال‌ها:</strong>
+                🥉مرحله ۵, 🥈مرحله ۱۰, 🥇مرحله ۱۵, 💎مرحله ۲۰
+            </p>
+        </details>
+
+        <header class="game-header">
+            <div id="medals-container">
+                <span id="medal-bronze" class="medal" title="رسیدن به مرحله ۵">🥉</span>
+                <span id="medal-silver" class="medal" title="رسیدن به مرحله ۱۰">🥈</span>
+                <span id="medal-gold" class="medal" title="رسیدن به مرحله ۱۵">🥇</span>
+                <span id="medal-master" class="medal" title="رسیدن به مرحله ۲۰">💎</span>
+            </div>
+            <h1>دنباله سریع</h1>
+            <div class="game-info">
+                <span>مرحله: <span id="level-display">1</span></span>
+                <div id="lives-display" class="lives"></div>
+                <span>بالاترین امتیاز: <span id="highscore-display">0</span></span>
+            </div>
+            <div id="hint-display-container">
+                <span id="hint-count">5</span>
+                <span>فرصت راهنما</span>
+            </div>
+        </header>
+
+        <main>
+            <div id="sequence-display" class="display-box">
+                <p id="display-text">برای شروع، دکمه "شروع" را بزن</p>
+            </div>
+
+            <div id="message-display" class="message"></div>
+
+            <div class="input-wrapper">
+                <div id="fake-input" class="input-display" dir="ltr"></div>
+                <input type="text" id="sequence-input" autocomplete="off" />
+            </div>
+
+            <div class="button-group">
+                <button id="sequence-submit-btn" disabled>تایید</button>
+            </div>
+        </main>
+        
+        <footer>
+            <button id="start-sequence-btn" class="start-btn">شروع</button>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
 

@@ -4,31 +4,23 @@
   <meta charset="UTF-8" />
   <title>اپ بازی‌های حافظه</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700&display=swap');
+
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      font-family: "Vazir", sans-serif;
+      font-family: 'Vazirmatn', sans-serif;
+      direction: rtl;
     }
 
     html, body {
       width: 100%;
       height: 100%;
       overflow: hidden;
-      background: #111;
-    }
-
-    body::before {
-      content: "";
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(270deg, #ff416c, #ff4b2b, #1e90ff, #00bcd4);
-      background-size: 800% 800%;
-      animation: gradientBG 15s ease infinite;
-      z-index: -1;
-      opacity: 0.6;
+      background: linear-gradient(270deg, #ff4e50, #f9d423, #24c6dc, #5433ff, #20bdff, #a8edea);
+      background-size: 1200% 1200%;
+      animation: gradientBG 30s ease infinite;
     }
 
     @keyframes gradientBG {
@@ -48,24 +40,32 @@
     }
 
     .menu h1 {
-      font-size: 48px;
-      margin-bottom: 40px;
-      color: #fff;
-      text-shadow: 0 0 30px rgba(255, 255, 255, 0.8);
+      font-size: 50px;
+      color: #ffffff;
+      text-shadow: 0 0 20px rgba(0,0,0,0.5);
+      margin-bottom: 60px;
+    }
+
+    .btn-group {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 30px;
+      width: 90%;
+      max-width: 800px;
     }
 
     .menu button,
     .back-btn,
     .exit-btn {
-      background: linear-gradient(45deg, #00f2fe, #4facfe);
-      border: none;
-      border-radius: 15px;
+      background: linear-gradient(45deg, #ff4e50, #f9d423);
       color: #fff;
-      font-size: 24px;
-      padding: 20px 60px;
-      margin: 15px;
+      font-size: 22px;
+      font-weight: bold;
+      padding: 20px;
+      border: none;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
       cursor: pointer;
-      box-shadow: 0 0 40px rgba(0, 242, 254, 0.6);
       position: relative;
       overflow: hidden;
       transition: all 0.3s ease;
@@ -74,8 +74,8 @@
     .menu button:hover,
     .back-btn:hover,
     .exit-btn:hover {
-      transform: scale(1.1);
-      box-shadow: 0 0 60px rgba(0, 242, 254, 0.9);
+      transform: translateY(-5px);
+      box-shadow: 0 15px 30px rgba(0,0,0,0.4);
     }
 
     .menu button::before,
@@ -83,11 +83,12 @@
     .exit-btn::before {
       content: "";
       position: absolute;
-      top: 0; left: -100%;
-      width: 200%;
+      top: 0;
+      left: -100%;
+      width: 300%;
       height: 100%;
       background: linear-gradient(120deg, rgba(255,255,255,0.3), transparent, rgba(255,255,255,0.3));
-      transform: skewX(-20deg);
+      transform: skewX(-30deg);
       transition: left 0.5s ease;
     }
 
@@ -99,21 +100,31 @@
 
     iframe {
       width: 90%;
+      max-width: 1200px;
       height: 600px;
       border: none;
-      border-radius: 20px;
-      box-shadow: 0 0 30px rgba(0,0,0,0.7);
-      margin-top: 20px;
+      border-radius: 15px;
+      box-shadow: 0 0 30px rgba(0,0,0,0.6);
+      margin-top: 30px;
+      background: #fff;
+    }
+
+    .back-btn, .exit-btn {
+      background: linear-gradient(45deg, #24c6dc, #5433ff);
+      margin: 15px 0;
+      width: 220px;
     }
   </style>
 </head>
 <body>
   <div class="menu" id="main-menu">
     <h1>بازی‌های حافظه</h1>
-    <button onclick="openGame('game1/index.html')">چالش الگو و کارت‌ها</button>
-    <button onclick="openGame('game2/index.html')">دنباله سریع</button>
-    <button onclick="openGame('game3/index.html')">کلمات گمشده</button>
-    <button class="exit-btn" onclick="exitApp()">خروج از بازی</button>
+    <div class="btn-group">
+      <button onclick="openGame('game1/index.html')">چالش الگو و کارت‌ها</button>
+      <button onclick="openGame('game2/index.html')">دنباله سریع</button>
+      <button onclick="openGame('game3/index.html')">کلمات گمشده</button>
+      <button class="exit-btn" onclick="exitApp()">خروج از بازی</button>
+    </div>
   </div>
 
   <div id="game-container" style="display: none;">
@@ -135,11 +146,8 @@
     }
 
     function exitApp() {
-      // اگر اپلیکیشن هست (مثلاً Cordova یا Webview) می‌تونی exit بزنی
-      // توی وب اینکارو می‌کنیم:
       window.close();
-      // اگر window.close کار نکرد (بعضی مرورگرها نمیذارن)، می‌تونی مثلا ری‌دایرکت کنی:
-      window.location.href = "https://google.com"; // یا صفحه دلخواهت
+      window.location.href = "https://google.com";
     }
   </script>
 </body>

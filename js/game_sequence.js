@@ -5,7 +5,7 @@ function initSequenceGame() {
         <div class="game-container">
             <details class="game-guide"><summary>راهنمای بازی</summary><p>دنباله اعداد را به خاطر بسپار و آن را تکرار کن. با هر اشتباه (پس از اتمام راهنماها) یک جان از دست می‌دهی.</p></details>
             <header class="game-header">
-                <div id="medals-container"><span class="medal" id="sq-medal-bronze">🥉</span><span class="medal" id="sq-medal-silver">🥈</span><span class="medal" id="sq-medal-gold">🥇</span><span class="medal" id="sq-medal-master">💎</span></div>
+                <div class="medals-container"><span id="sq-medal-bronze" class="medal">🥉</span><span id="sq-medal-silver" class="medal">🥈</span><span id="sq-medal-gold" class="medal">🥇</span><span id="sq-medal-master" class="medal">💎</span></div>
                 <h1>دنباله سریع</h1>
                 <div class="game-info"><span>مرحله: <span id="sq-level-display">1</span></span><div id="sq-lives-display" class="lives"></div><span>بالاترین مرحله: <span id="sq-highscore-display">0</span></span></div>
             </header>
@@ -24,7 +24,7 @@ function initSequenceGame() {
           submitBtn = view.find('#sq-sequence-submit-btn'), startBtn = view.find('#sq-start-sequence-btn'), messageDisplay = view.find('#sq-message-display');
           
     let level, sequence, lives, isPlaying, highScore, timer;
-    const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+    const sleep = (ms) => new Promise(resolve => { timer = setTimeout(resolve, ms); });
 
     function updateUI() {
         levelDisplay.text(level); highscoreDisplay.text(highScore);
@@ -33,11 +33,11 @@ function initSequenceGame() {
     async function displaySequence() {
         isPlaying = true; setInputsDisabled(true); displayText.text('آماده؟'); await sleep(1000);
         const displayTime = Math.max(300, 800 - (level * 30));
-        for (const num of sequence) { displayText.text(num); await sleep(displayTime); displayText.text(''); await sleep(200); }
-        displayText.text('؟'); isPlaying = false; setInputsDisabled(false); sequenceInput.focus();
+        for (const num of sequence) { if (!isPlaying) return; displayText.text(num); await sleep(displayTime); displayText.text(''); await sleep(200); }
+        if (!isPlaying) return; displayText.text('؟'); isPlaying = false; setInputsDisabled(false); sequenceInput.focus();
     }
     function handleCorrectAnswer() {
-        level++; if (level > highScore) { highScore = level; localStorage.setItem('sequenceHighScore', highScore); }
+        level++; if (level > highScore) { highScore = level; localStorage.setItem('MIND_BATTLE_sequenceHighScore', highScore); }
         messageDisplay.text('عالی بود! مرحله بعد...').attr('class', 'message correct');
         setTimeout(() => { resetRoundState(); startRound(); }, 1500);
     }
@@ -52,22 +52,23 @@ function initSequenceGame() {
         }
     }
     function checkAnswer() {
-        setInputsDisabled(true); (sequenceInput.val() === sequence.join('')) ? handleCorrectAnswer() : handleWrongAnswer();
+        setInputsDisabled(true);
+        (sequenceInput.val() === sequence.join('')) ? handleCorrectAnswer() : handleWrongAnswer();
         sequenceInput.val(''); fakeInput.html('');
     }
     function setInputsDisabled(state) { submitBtn.prop('disabled', state); sequenceInput.prop('disabled', state); }
     function resetRoundState() { messageDisplay.text('').attr('class', 'message'); }
     function startRound() { sequence = []; for (let i = 0; i < level; i++) sequence.push(Math.floor(Math.random() * 9) + 1); updateUI(); displaySequence(); }
     function startGame() {
-        level = 1; lives = 3; highScore = localStorage.getItem('sequenceHighScore') || 0;
-        startBtn.text('...').prop('disabled', true); startRound();
+        level = 1; lives = 3; highScore = localStorage.getItem('MIND_BATTLE_sequenceHighScore') || 0;
+        startBtn.text('...در حال اجرا...').prop('disabled', true); startRound();
     }
 
-    startBtn.on('click', startGame);
-    submitBtn.on('click', checkAnswer);
-    sequenceInput.on('keydown', e => { if (e.key === 'Enter' && !submitBtn.prop('disabled')) checkAnswer(); });
-    sequenceInput.on('input', () => { fakeInput.text(sequenceInput.val()); });
+    view.on('click', '#sq-start-sequence-btn', startGame);
+    view.on('click', '#sq-sequence-submit-btn', checkAnswer);
+    view.on('keydown', '#sq-sequence-input', e => { if (e.key === 'Enter' && !submitBtn.prop('disabled')) checkAnswer(); });
+    view.on('input', '#sq-sequence-input', () => { fakeInput.text(sequenceInput.val()); });
     
     startGame();
-    return function cleanup() { clearInterval(timer); view.off(); view.empty(); };
+    return function cleanup() { isPlaying = false; clearTimeout(timer); view.off(); view.empty(); };
 }

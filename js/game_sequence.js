@@ -8,6 +8,7 @@ function initSequenceGame() {
                 <div class="medals-container"><span id="sq-medal-bronze" class="medal">🥉</span><span id="sq-medal-silver" class="medal">🥈</span><span id="sq-medal-gold" class="medal">🥇</span><span id="sq-medal-master" class="medal">💎</span></div>
                 <h1>دنباله سریع</h1>
                 <div class="game-info"><span>مرحله: <span id="sq-level-display">1</span></span><div id="sq-lives-display" class="lives"></div><span>بالاترین مرحله: <span id="sq-highscore-display">0</span></span></div>
+                <div id="sq-hint-container"><span>فرصت راهنما: </span><span id="sq-hint-count">5</span></div>
             </header>
             <main>
                 <div class="display-box"><p id="sq-display-text">برای شروع، دکمه "شروع" را بزن</p></div>
@@ -19,56 +20,74 @@ function initSequenceGame() {
         </div>
     `);
 
-    const levelDisplay = view.find('#sq-level-display'), highscoreDisplay = view.find('#sq-highscore-display'), livesDisplay = view.find('#sq-lives-display'),
-          displayText = view.find('#sq-display-text'), sequenceInput = view.find('#sq-sequence-input'), fakeInput = view.find('#sq-fake-input'),
-          submitBtn = view.find('#sq-sequence-submit-btn'), startBtn = view.find('#sq-start-sequence-btn'), messageDisplay = view.find('#sq-message-display');
-          
-    let level, sequence, lives, isPlaying, highScore, timer;
-    const sleep = (ms) => new Promise(resolve => { timer = setTimeout(resolve, ms); });
+    // Scoped variables and elements
+    const scope = {
+        level: 1, sequence: [], lives: 3, hintChances: 5, isPlaying: false, highScore: 0, timer: null,
+        levelDisplay: view.find('#sq-level-display'), highscoreDisplay: view.find('#sq-highscore-display'),
+        livesDisplay: view.find('#sq-lives-display'), hintCountDisplay: view.find('#sq-hint-count'),
+        displayText: view.find('#sq-display-text'), sequenceInput: view.find('#sq-sequence-input'),
+        fakeInput: view.find('#sq-fake-input'), submitBtn: view.find('#sq-sequence-submit-btn'),
+        startBtn: view.find('#sq-start-sequence-btn'), messageDisplay: view.find('#sq-message-display'),
+        achievements: JSON.parse(localStorage.getItem('MIND_BATTLE_sequenceAchievements')) || { bronze: false, silver: false, gold: false, master: false }
+    };
+    const sleep = (ms) => new Promise(resolve => { scope.timer = setTimeout(resolve, ms); });
 
     function updateUI() {
-        levelDisplay.text(level); highscoreDisplay.text(highScore);
-        livesDisplay.html(''); for (let i = 1; i <= 3; i++) livesDisplay.append($('<span>').addClass('heart').toggleClass('lost', i > lives).text('♥'));
+        scope.levelDisplay.text(scope.level); scope.highscoreDisplay.text(scope.highScore);
+        scope.livesDisplay.html(''); for (let i = 1; i <= 3; i++) scope.livesDisplay.append($('<span>').addClass('heart').toggleClass('lost', i > scope.lives).text('♥'));
     }
     async function displaySequence() {
-        isPlaying = true; setInputsDisabled(true); displayText.text('آماده؟'); await sleep(1000);
-        const displayTime = Math.max(300, 800 - (level * 30));
-        for (const num of sequence) { if (!isPlaying) return; displayText.text(num); await sleep(displayTime); displayText.text(''); await sleep(200); }
-        if (!isPlaying) return; displayText.text('؟'); isPlaying = false; setInputsDisabled(false); sequenceInput.focus();
+        scope.isPlaying = true; setInputsDisabled(true); scope.displayText.text('آماده؟'); await sleep(1000);
+        const displayTime = Math.max(300, 800 - (scope.level * 30));
+        for (const num of scope.sequence) { if (!scope.isPlaying) return; scope.displayText.text(num); await sleep(displayTime); scope.displayText.text(''); await sleep(200); }
+        if (!scope.isPlaying) return; scope.displayText.text('؟'); scope.isPlaying = false; setInputsDisabled(false); scope.sequenceInput.focus();
     }
     function handleCorrectAnswer() {
-        level++; if (level > highScore) { highScore = level; localStorage.setItem('MIND_BATTLE_sequenceHighScore', highScore); }
-        messageDisplay.text('عالی بود! مرحله بعد...').attr('class', 'message correct');
+        scope.level++;
+        if (scope.level > scope.highScore) { scope.highScore = scope.level; localStorage.setItem('MIND_BATTLE_sequenceHighScore', scope.highScore); }
+        scope.messageDisplay.text('عالی بود! مرحله بعد...').attr('class', 'message correct');
         setTimeout(() => { resetRoundState(); startRound(); }, 1500);
     }
     function handleWrongAnswer() {
-        lives--;
-        if (lives > 0) {
-            messageDisplay.text(`اشتباه بود! ${lives} جان دیگر باقیست.`).attr('class', 'message wrong');
-            setTimeout(() => { resetRoundState(); startRound(); }, 2000);
+        if (scope.hintChances > 0) {
+            scope.hintChances--; scope.messageDisplay.text('اشتباه بود! از راهنمای خودکار استفاده شد.').attr('class', 'message wrong');
+            const userAnswer = scope.sequenceInput.val().split(''), correctSequenceChars = scope.sequence.join('').split(''); let coloredHTML = '';
+            for (let i = 0; i < correctSequenceChars.length; i++) {
+                const char = (i < userAnswer.length) ? userAnswer[i] : '_';
+                const charClass = (i < userAnswer.length && userAnswer[i] === correctSequenceChars[i]) ? 'char-correct' : 'char-wrong';
+                coloredHTML += `<span class="${charClass}">${char}</span>`;
+            }
+            scope.fakeInput.html(coloredHTML); setInputsDisabled(false);
         } else {
-            messageDisplay.text(`باختی! دنباله صحیح: ${sequence.join('')}`).attr('class', 'message wrong');
-            displayText.text('GAME OVER'); setInputsDisabled(true); startBtn.text('شروع مجدد').prop('disabled', false);
+            scope.lives--;
+            if (scope.lives > 0) {
+                scope.messageDisplay.text(`فرصت راهنما تمام شد! یک جان از دست دادی.`).attr('class', 'message wrong');
+                setTimeout(() => { resetRoundState(); startRound(); }, 2000);
+            } else {
+                scope.messageDisplay.text(`باختی! دنباله صحیح: ${scope.sequence.join('')}`).attr('class', 'message wrong');
+                scope.displayText.text('GAME OVER'); setInputsDisabled(true); scope.startBtn.text('شروع مجدد').prop('disabled', false);
+            }
         }
+        updateUI();
     }
     function checkAnswer() {
         setInputsDisabled(true);
-        (sequenceInput.val() === sequence.join('')) ? handleCorrectAnswer() : handleWrongAnswer();
-        sequenceInput.val(''); fakeInput.html('');
+        (scope.sequenceInput.val() === scope.sequence.join('')) ? handleCorrectAnswer() : handleWrongAnswer();
     }
-    function setInputsDisabled(state) { submitBtn.prop('disabled', state); sequenceInput.prop('disabled', state); }
-    function resetRoundState() { messageDisplay.text('').attr('class', 'message'); }
-    function startRound() { sequence = []; for (let i = 0; i < level; i++) sequence.push(Math.floor(Math.random() * 9) + 1); updateUI(); displaySequence(); }
+    function setInputsDisabled(state) { scope.submitBtn.prop('disabled', state); scope.sequenceInput.prop('disabled', state); }
+    function resetRoundState() { scope.messageDisplay.text('').attr('class', 'message'); scope.sequenceInput.val(''); scope.fakeInput.html(''); }
+    function startRound() { scope.sequence = []; for (let i = 0; i < scope.level; i++) scope.sequence.push(Math.floor(Math.random() * 9) + 1); updateUI(); displaySequence(); }
     function startGame() {
-        level = 1; lives = 3; highScore = localStorage.getItem('MIND_BATTLE_sequenceHighScore') || 0;
-        startBtn.text('...در حال اجرا...').prop('disabled', true); startRound();
+        scope.level = 1; scope.lives = 3; scope.hintChances = 5; scope.highScore = localStorage.getItem('MIND_BATTLE_sequenceHighScore') || 0;
+        scope.startBtn.text('...در حال اجرا...').prop('disabled', true);
+        startRound();
     }
 
     view.on('click', '#sq-start-sequence-btn', startGame);
     view.on('click', '#sq-sequence-submit-btn', checkAnswer);
-    view.on('keydown', '#sq-sequence-input', e => { if (e.key === 'Enter' && !submitBtn.prop('disabled')) checkAnswer(); });
-    view.on('input', '#sq-sequence-input', () => { fakeInput.text(sequenceInput.val()); });
+    view.on('keydown', '#sq-sequence-input', e => { if (e.key === 'Enter' && !scope.submitBtn.prop('disabled')) checkAnswer(); });
+    view.on('input', '#sq-sequence-input', () => { scope.fakeInput.text(scope.sequenceInput.val()); });
     
     startGame();
-    return function cleanup() { isPlaying = false; clearTimeout(timer); view.off(); view.empty(); };
+    return function cleanup() { scope.isPlaying = false; clearTimeout(scope.timer); view.off(); view.empty(); };
 }

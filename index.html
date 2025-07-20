@@ -1,1 +1,31 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>کارآگاه کلمات</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="game-container">
+        <header>
+            <h1>کارآگاه کلمات 🕵️‍♂️</h1>
+            <div id="difficulty-selector">
+                <button data-length="4" class="difficulty-btn">۴ حرفی</button>
+                <button data-length="5" class="difficulty-btn active">۵ حرفی</button>
+                <button data-length="6" class="difficulty-btn">۶ حرفی</button>
+            </div>
+        </header>
+        
+        <main id="grid-container"></main>
+
+        <div id="keyboard-container"></div>
+        
+        <div id="toast" class="">کلمه در لیست نیست!</div>
+    </div>
+    
+    <script src="words.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
 
